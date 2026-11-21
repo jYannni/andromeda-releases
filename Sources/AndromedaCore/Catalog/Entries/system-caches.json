@@ -1,0 +1,22 @@
+{
+  "id": "system-caches",
+  "title": "Shared system caches",
+  "explanation": "macOS and apps keep caches here that every user on this Mac shares, and many of the folders belong to the system. macOS and the apps rebuild them as needed.",
+  "consequence": "Leaving them is fine, since clearing them usually frees little space.",
+  "paths": [
+    "/Library/Caches/*"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "none"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

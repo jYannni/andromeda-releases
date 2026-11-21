@@ -1,0 +1,2 @@
+/docs/updates/*.xml -text
+/docs/updates/*.md -text

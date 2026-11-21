@@ -1,0 +1,38 @@
+{
+  "id": "user-caches-other",
+  "title": "Other app caches",
+  "explanation": "Apps keep caches here so they work faster, one folder per app, and most of Apple's own caches are left out of this list. Each app rebuilds its cache the next time it needs it, though some take a while to do so.",
+  "consequence": "Apps may open or load more slowly at first while they rebuild their caches.",
+  "paths": [
+    "~/Library/Caches/*"
+  ],
+  "exclude": [
+    "~/Library/Caches/com.apple.*",
+    "~/Library/Caches/CloudKit",
+    "~/Library/Caches/GeoServices",
+    "~/Library/Caches/FamilyCircle",
+    "~/Library/Caches/familycircled",
+    "~/Library/Caches/GameKit",
+    "~/Library/Caches/PassKit",
+    "~/Library/Caches/Animoji",
+    "~/Library/Caches/askpermissiond",
+    "~/Library/Caches/AMSDataMigratorTool",
+    "~/Library/Caches/RemoteKeyboard"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "with-care",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-11-02"
+}

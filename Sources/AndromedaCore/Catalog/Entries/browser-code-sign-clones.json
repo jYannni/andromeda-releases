@@ -1,0 +1,30 @@
+{
+  "id": "browser-code-sign-clones",
+  "title": "Chrome and Brave sign-check copies",
+  "explanation": "When Chrome or Brave updates, it keeps a copy of itself here so macOS can keep checking its signature while it runs, and old copies sometimes pile up. The copies share storage with each other, so this folder looks much bigger than the space it really takes.",
+  "consequence": "Removing them usually frees little space because the copies share storage, the browser makes a fresh copy the next time it starts, and your bookmarks, passwords and history stay as they are.",
+  "paths": [
+    "$USER_VAR_FOLDER/X/com.google.Chrome.code_sign_clone",
+    "$USER_VAR_FOLDER/X/com.brave.Browser.code_sign_clone"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "with-care",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [
+    "com.google.Chrome",
+    "com.brave.Browser"
+  ],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://chromium.googlesource.com/chromium/src/+/5fe6977d30e2d68d519ac979ee901bac92fb2e10/chrome/browser/mac/code_sign_clone_manager.h",
+    "https://github.com/rubycdp/ferrum/pull/555"
+  ],
+  "last_verified": "2026-11-02"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "lm-studio-model-store",
+  "title": "LM Studio models",
+  "explanation": "LM Studio keeps downloaded and imported models in this folder by default. Imported models can be files you moved here, including models you can't download again.",
+  "consequence": "If an imported file is your only copy, removing it loses that copy.",
+  "paths": [
+    "~/.lmstudio/models"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Open My Models in LM Studio and review each model before removing it.",
+    "url": "https://lmstudio.ai/docs/app/basics/download-model#changing-the-models-directory"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://lmstudio.ai/docs/app/advanced/import-model",
+    "https://lmstudio.ai/docs/app/basics/download-model",
+    "https://lmstudio.ai/docs/cli/local-models/import"
+  ],
+  "last_verified": "2026-11-15"
+}

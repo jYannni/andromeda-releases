@@ -1,0 +1,25 @@
+{
+  "id": "vm-disks",
+  "title": "Virtual machines",
+  "explanation": "These are virtual machines from UTM, Parallels or VMware, each holding a whole operating system and its files. Each app can delete or compact its own machines.",
+  "consequence": "A deleted virtual machine and everything inside it is gone unless you have a backup of it.",
+  "paths": [
+    "~/Library/Containers/com.utmapp.UTM/Data/Documents/*.utm",
+    "~/Parallels/*.pvm",
+    "~/Virtual Machines.localized/*"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "documents",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Delete or compact VMs in their own app."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://github.com/utmapp/UTM/discussions/3607"
+  ],
+  "last_verified": "2026-10-29"
+}

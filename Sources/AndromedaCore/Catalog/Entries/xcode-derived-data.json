@@ -1,0 +1,27 @@
+{
+  "id": "xcode-derived-data",
+  "title": "Xcode DerivedData",
+  "explanation": "Xcode keeps build products and indexes for your projects here. Xcode rebuilds them on the next build.",
+  "consequence": "Your next build of each project takes longer while Xcode rebuilds them.",
+  "paths": [
+    "~/Library/Developer/Xcode/DerivedData"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "developer",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [
+    "com.apple.dt.Xcode"
+  ],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-11-02"
+}

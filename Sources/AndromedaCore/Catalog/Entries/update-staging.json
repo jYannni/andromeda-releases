@@ -1,0 +1,23 @@
+{
+  "id": "update-staging",
+  "title": "macOS update bookkeeping",
+  "explanation": "macOS keeps bookkeeping for software updates here, while the staged update itself is held by macOS elsewhere. Both belong to macOS, so no app can remove them.",
+  "consequence": "Once you finish or cancel the update and restart, macOS cleans up on its own.",
+  "paths": [
+    "/Library/Updates"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "cant-remove",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Finish or cancel the pending macOS update, then restart."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-10-29"
+}

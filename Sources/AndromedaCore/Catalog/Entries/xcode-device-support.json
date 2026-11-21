@@ -1,0 +1,23 @@
+{
+  "id": "xcode-device-support",
+  "title": "Device support files",
+  "explanation": "Xcode copies these files from each iPhone, iPad or Apple Watch you connect, one folder per OS version, so it can debug on that device. Xcode copies them again the next time you connect a device running that version.",
+  "consequence": "The next time you connect a device with that OS version, Xcode spends a few minutes preparing it again.",
+  "paths": [
+    "~/Library/Developer/Xcode/iOS DeviceSupport/*",
+    "~/Library/Developer/Xcode/watchOS DeviceSupport/*"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "developer",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-10-29"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "spotify-cache",
+  "title": "Spotify cache",
+  "explanation": "Spotify keeps cached data here. Spotify rebuilds it as you listen.",
+  "consequence": "Spotify may take a moment longer to load things until it caches them again.",
+  "paths": [
+    "~/Library/Caches/com.spotify.client"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "with-care",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [
+    "com.spotify.client"
+  ],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

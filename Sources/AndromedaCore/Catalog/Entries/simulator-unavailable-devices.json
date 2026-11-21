@@ -1,0 +1,33 @@
+{
+  "id": "simulator-unavailable-devices",
+  "title": "Simulator devices",
+  "explanation": "This size is the whole Devices folder, where each simulated iPhone, iPad or Apple Watch keeps its apps and data. Removal runs `xcrun simctl delete unavailable`, which deletes only the devices whose runtime is no longer installed.",
+  "consequence": "Devices you can still run stay as they are, and Xcode creates new ones when you add a runtime.",
+  "paths": [
+    "~/Library/Developer/CoreSimulator/Devices"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "developer",
+  "tier": "safe",
+  "removal": {
+    "kind": "tool",
+    "executable": "/usr/bin/xcrun",
+    "arguments": [
+      "simctl",
+      "delete",
+      "unavailable"
+    ]
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": "/usr/bin/xcrun",
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://developer.apple.com/forums/thread/773153",
+    "https://furbo.org/2022/11/09/managing-xcode-downloads",
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-11-02"
+}

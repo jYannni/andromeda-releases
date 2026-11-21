@@ -1,0 +1,28 @@
+{
+  "id": "docker-desktop-disk",
+  "title": "Docker Desktop disk",
+  "explanation": "Docker Desktop keeps your images, containers and volumes inside this one virtual disk, which grows as you use Docker. Removal runs `docker system prune -f`, which deletes stopped containers and any changes made inside them, plus unused networks, dangling images and unused build cache.",
+  "consequence": "Your volumes and running containers stay as they are, and Docker rebuilds its build cache the next time you build.",
+  "paths": [
+    "~/Library/Containers/com.docker.docker/Data/vms/0/data/Docker.raw"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "with-care",
+  "removal": {
+    "kind": "tool",
+    "executable": "/usr/local/bin/docker",
+    "arguments": [
+      "system",
+      "prune",
+      "-f"
+    ]
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": "/usr/local/bin/docker",
+  "verified_on": [],
+  "sources": [
+    "https://docs.docker.com/desktop/troubleshoot-and-support/faqs/macfaqs/"
+  ],
+  "last_verified": "2026-10-29"
+}

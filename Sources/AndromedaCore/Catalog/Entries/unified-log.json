@@ -1,0 +1,22 @@
+{
+  "id": "unified-log",
+  "title": "System log",
+  "explanation": "This is the unified log, where macOS records system activity for troubleshooting. macOS rotates it on its own and removes old entries as it goes.",
+  "consequence": "Leaving it is fine, because macOS keeps rotating it without any help.",
+  "paths": [
+    "/private/var/db/diagnostics"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "none"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

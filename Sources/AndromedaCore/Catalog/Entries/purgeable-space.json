@@ -1,0 +1,23 @@
+{
+  "id": "purgeable-space",
+  "title": "Purgeable space",
+  "explanation": "Purgeable space holds caches and other items that macOS can clear by itself whenever space is needed. Storage settings counts it as available rather than used, and so does Andromeda.",
+  "consequence": "There is nothing to remove, because macOS gives this space back as soon as an app needs it.",
+  "paths": [],
+  "sizing": "none",
+  "bucket": "system-data",
+  "tier": "cant-remove",
+  "removal": {
+    "kind": "none"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://discussions.apple.com/docs/DOC-250012471",
+    "https://eclecticlight.co/2023/04/15/what-is-purgeable-disk-space/",
+    "https://eclecticlight.co/2023/04/27/where-does-macos-get-its-volume-free-space-figures-from/",
+    "https://daisydiskapp.com/guide/purgeable-space"
+  ],
+  "last_verified": "2026-11-05"
+}

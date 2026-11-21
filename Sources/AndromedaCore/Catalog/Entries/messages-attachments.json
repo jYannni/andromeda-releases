@@ -1,0 +1,24 @@
+{
+  "id": "messages-attachments",
+  "title": "Messages attachments",
+  "explanation": "Photos, videos and files from your conversations in Messages are stored here. Removing them in Finder would break those conversations, so Messages settings and Storage settings are the places to remove them.",
+  "consequence": "Attachments you remove through Messages disappear from their conversations on this Mac.",
+  "paths": [
+    "~/Library/Messages/Attachments"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "messages",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Messages › Settings › Keep messages, or Storage › Messages › Review.",
+    "url": "x-apple.systempreferences:com.apple.settings.Storage"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

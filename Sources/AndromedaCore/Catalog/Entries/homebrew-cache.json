@@ -1,0 +1,24 @@
+{
+  "id": "homebrew-cache",
+  "title": "Homebrew download cache",
+  "explanation": "Homebrew keeps downloaded packages here so it can reinstall them without fetching them again.",
+  "consequence": "Reinstalling or upgrading a package may take longer while Homebrew downloads it again.",
+  "paths": [
+    "~/Library/Caches/Homebrew"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    27
+  ],
+  "sources": [
+    "https://dev.to/md_ayanbag_03a42545b17ac/updating-to-macos-27-golden-gate-check-your-system-data-first-3adp"
+  ],
+  "last_verified": "2026-11-02"
+}

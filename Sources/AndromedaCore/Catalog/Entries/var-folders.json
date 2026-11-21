@@ -1,0 +1,22 @@
+{
+  "id": "var-folders",
+  "title": "Temporary files and caches",
+  "explanation": "macOS and apps keep temporary files and per-user caches in this folder, and many of them are in use while your Mac is running. A restart clears temporary files here; some caches stay.",
+  "consequence": "Restarting your Mac lets macOS clear what is no longer needed.",
+  "paths": [
+    "/private/var/folders"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "restart"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-10-29"
+}

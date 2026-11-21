@@ -1,0 +1,24 @@
+{
+  "id": "apple-intelligence-models",
+  "title": "Apple Intelligence models",
+  "explanation": "These are the on-device models Apple Intelligence uses, often 14 to 30 GB on macOS 27, and macOS 27 has no setting to turn them off or remove them. Their size can't always be measured, because macOS protects this folder even from apps with Full Disk Access.",
+  "consequence": "No app can remove these models, and if macOS removes them, it may download them again.",
+  "paths": [
+    "/System/Library/AssetsV2/com_apple_MobileAsset_UAF_FM_GenerativeModels"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "macos",
+  "tier": "cant-remove",
+  "removal": {
+    "kind": "none"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://macrumors.com/2026/09/23/apple-intelligence-30gb-some-macs-macos-27",
+    "https://apple.gadgethacks.com/how-to/how-to-remove-apple-intelligence-models-on-mac-in-macos-27/",
+    "https://macdailynews.com/2026/09/25/apple-intelligence-is-eating-up-to-30gb-on-some-macs-after-macos-27/"
+  ],
+  "last_verified": "2026-10-29"
+}

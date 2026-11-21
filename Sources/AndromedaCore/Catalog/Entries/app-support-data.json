@@ -1,0 +1,22 @@
+{
+  "id": "app-support-data",
+  "title": "App data",
+  "explanation": "Apps keep their settings, databases and downloaded content here, one folder per app, and some take many GB. This is your data, so each app's own settings are the place to make it smaller.",
+  "consequence": "Removing an app's folder outside the app resets that app and can lose its data.",
+  "paths": [
+    "~/Library/Application Support/*"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "none"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://dev.to/md_ayanbag_03a42545b17ac/updating-to-macos-27-golden-gate-check-your-system-data-first-3adp"
+  ],
+  "last_verified": "2026-10-29"
+}

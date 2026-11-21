@@ -1,0 +1,23 @@
+{
+  "id": "macos-update-snapshots",
+  "title": "macOS update snapshots",
+  "explanation": "macOS takes these snapshots while it prepares or installs an update, and they hold on to old copies of files until the update is done. They belong to macOS, so no app can remove them.",
+  "consequence": "Once you finish or cancel the update and restart, macOS releases this space on its own.",
+  "paths": [],
+  "sizing": "snapshots",
+  "bucket": "system-data",
+  "tier": "cant-remove",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Finish or cancel the pending macOS update, then restart.",
+    "url": "x-apple.systempreferences:com.apple.Software-Update-Settings.extension"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2020/01/22/time-machine-11-tmutil/",
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-10-29"
+}

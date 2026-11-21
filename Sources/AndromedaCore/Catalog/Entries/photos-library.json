@@ -1,0 +1,23 @@
+{
+  "id": "photos-library",
+  "title": "Photos library",
+  "explanation": "Your Photos library holds your photos and videos plus the previews Photos makes from them. Changing the library from outside Photos can damage it, so the Optimize Mac Storage setting in Photos is the way to make it smaller.",
+  "consequence": "With Optimize Mac Storage on, full-size originals stay in iCloud and download when you open them.",
+  "paths": [
+    "~/Pictures/Photos Library.photoslibrary"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "photos",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Photos › Settings › iCloud › Optimize Mac Storage."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

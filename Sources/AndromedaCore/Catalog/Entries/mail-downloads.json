@@ -1,0 +1,24 @@
+{
+  "id": "mail-downloads",
+  "title": "Mail attachment downloads",
+  "explanation": "Mail saves copies of attachments here when you open them. The originals stay in your mailbox, and Mail saves a new copy the next time you open one.",
+  "consequence": "Attachments may open a little slower the first time while Mail copies them again.",
+  "paths": [
+    "~/Library/Containers/com.apple.mail/Data/Library/Mail Downloads"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "mail",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [
+    "com.apple.mail"
+  ],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "time-machine-local-snapshots",
+  "title": "Time Machine local snapshots",
+  "explanation": "Time Machine keeps snapshots on this disk so you can restore recent files even when your backup drive isn't connected. macOS removes them on its own, usually after about 24 hours, or sooner when space runs low.",
+  "consequence": "You can no longer restore files from those points in time, and the backups on your Time Machine drive stay as they are.",
+  "paths": [],
+  "sizing": "snapshots",
+  "bucket": "system-data",
+  "tier": "with-care",
+  "removal": {
+    "kind": "delete-local-snapshots"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://eclecticlight.co/2020/01/22/time-machine-11-tmutil/",
+    "https://developer.apple.com/forums/thread/121776",
+    "https://talk.tidbits.com/t/excessive-system-data-on-a-macbook-pro-any-ideas/33460",
+    "https://eclecticlight.co/2023/04/27/where-does-macos-get-its-volume-free-space-figures-from/"
+  ],
+  "last_verified": "2026-11-02"
+}

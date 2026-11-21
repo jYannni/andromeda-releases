@@ -1,0 +1,28 @@
+{
+  "id": "xcode-caches",
+  "title": "Xcode caches",
+  "explanation": "Xcode keeps its documentation and other caches here. Xcode rebuilds them the next time it needs them.",
+  "consequence": "Documentation and some Xcode features may load more slowly at first while the caches rebuild.",
+  "paths": [
+    "~/Library/Developer/Xcode/DocumentationCache",
+    "~/Library/Caches/com.apple.dt.Xcode"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "developer",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [
+    "com.apple.dt.Xcode"
+  ],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-11-02"
+}

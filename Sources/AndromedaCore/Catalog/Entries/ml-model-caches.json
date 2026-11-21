@@ -1,0 +1,27 @@
+{
+  "id": "ml-model-caches",
+  "title": "Downloaded AI models",
+  "explanation": "Hugging Face tools keep downloaded models and datasets in these folders, and a single model can take many GB. Your Hugging Face login token is not included, and the models download again the next time a script or app asks for them.",
+  "consequence": "Large models can take a long time to download again, and they won't work offline until they do.",
+  "paths": [
+    "~/.cache/huggingface/hub",
+    "~/.cache/huggingface/datasets",
+    "~/.cache/huggingface/xet"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "with-care",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://github.com/tw93/Mole"
+  ],
+  "last_verified": "2026-11-02"
+}

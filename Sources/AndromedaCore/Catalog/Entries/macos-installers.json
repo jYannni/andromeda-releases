@@ -1,0 +1,25 @@
+{
+  "id": "macos-installers",
+  "title": "macOS installer apps",
+  "explanation": "These are full macOS installers, usually 13 to 18 GB each, left in Applications after an upgrade or download. macOS doesn't need them once the install is done.",
+  "consequence": "To install that macOS version again later, you would download the installer again.",
+  "paths": [
+    "/Applications/Install macOS*.app"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Open Applications in Finder and drag the installer to the Trash. macOS asks for your password because the installer belongs to the system.",
+    "url": "file:///Applications/"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://deepcleanmac.com/blog/storage-full-after-macos-27-update",
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-11-04"
+}

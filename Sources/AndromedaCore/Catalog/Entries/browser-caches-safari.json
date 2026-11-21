@@ -1,0 +1,24 @@
+{
+  "id": "browser-caches-safari",
+  "title": "Safari cache",
+  "explanation": "Safari keeps copies of web pages and images here so sites load faster. Safari manages this cache itself and can empty it from its Develop menu, which you turn on in Safari's Advanced settings.",
+  "consequence": "Sites load a little slower the first time you visit them again, and Safari rebuilds the cache as you browse.",
+  "paths": [
+    "~/Library/Caches/com.apple.Safari",
+    "~/Library/Containers/com.apple.Safari/Data/Library/Caches"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Turn on the Develop menu in Safari › Settings › Advanced, then choose Develop › Empty Caches."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

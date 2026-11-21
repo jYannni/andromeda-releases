@@ -1,0 +1,73 @@
+[
+  {
+    "version": "0.2.70",
+    "date": "2026-11-21",
+    "sections": [
+      {"title": "Changed", "items": [
+        "DiskPlain is now Andromeda, with a blue-to-purple galaxy icon.",
+        "The in-app logo displays in color when its window is active and in grayscale when it is inactive.",
+        "Andromeda keeps the settings, history, and archives from earlier versions.",
+        "This is the first public release. Install it once from the public download to switch from an earlier private beta to the new update feed."
+      ]}
+    ]
+  },
+  {
+    "version": "0.2.69",
+    "date": "2026-11-17",
+    "sections": [
+      {"title": "Added", "items": [
+        "Organise a Folder can now preview and apply moves inside a selected cloud folder. The preview explains that moves can sync to your other devices.",
+        "History can put moved files back. Any folders created by the plan stay in place.",
+        "Online-only files are listed as needing a download before Andromeda can organise them."
+      ]},
+      {"title": "Fixed", "items": [
+        "Sidebar sizes stay aligned to the right when category names wrap."
+      ]}
+    ]
+  },
+  {
+    "version": "0.2.68",
+    "date": "2026-11-17",
+    "sections": [
+      {"title": "Added", "items": [
+        "Open **What’s New** from Settings or Sparkle’s Version History button to read release notes in Andromeda.",
+        "See total disk space for all matches in Scan a Folder, including results beyond the first page.",
+        "Undo a single move or remove an unchanged copy from History. Protect project folders from Move to Cloud suggestions."
+      ]},
+      {"title": "Improved", "items": [
+        "Folder scans continue when you switch pages. Storage Map prepares during Scan This Mac, keeps its results, and shows small items’ names and sizes on hover.",
+        "Overview separates the sum of file allocations from macOS used space and points to detected shared storage.",
+        "Settings has a curved sidebar, six visible categories, and neutral highlights. The main sidebar keeps long names readable, and first-run setup offers US or UK spelling.",
+        "Andromeda has a new folder icon and clearer labels for cloud and external archive tools."
+      ]},
+      {"title": "Fixed", "items": [
+        "Device Support and other unverified cleanup entries show **Report only** for the installed macOS version."
+      ]}
+    ]
+  },
+  {
+    "version": "0.2.67",
+    "date": "2026-11-16",
+    "sections": [
+      {"title": "Fixed", "items": ["External Archives can verify copies and restore files when macOS adds its own provenance metadata to a new file or folder."]}
+    ]
+  },
+  {
+    "version": "0.2.66",
+    "date": "2026-11-16",
+    "sections": [
+      {"title": "Improved", "items": [
+        "What changed? puts the largest changes first and opens Space Plan from a folder you’ve added.",
+        "Cleanup review shows the exact target path and explains how to put files back from History."
+      ]}
+    ]
+  },
+  {
+    "version": "0.2.65",
+    "date": "2026-11-16",
+    "sections": [
+      {"title": "Fixed", "items": ["Scan a Folder reads `/private/tmp` and `/tmp`."]},
+      {"title": "Improved", "items": ["External Archives puts matching files first, names the drive to connect, and links to a verified restored file."]}
+    ]
+  }
+]

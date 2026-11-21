@@ -1,0 +1,30 @@
+{
+  "id": "package-manager-caches",
+  "title": "Developer package caches",
+  "explanation": "Package managers such as npm, pip, Yarn, pnpm, Go and Gradle keep downloaded packages here so installs are faster. Each tool downloads them again the next time a project needs them.",
+  "consequence": "The next install or build in each project takes longer while the tool downloads its packages again.",
+  "paths": [
+    "~/.npm/_cacache",
+    "~/Library/Caches/pip",
+    "~/Library/Caches/Yarn",
+    "~/Library/pnpm/store",
+    "~/go/pkg/mod",
+    "~/.gradle/caches"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://github.com/tw93/Mole"
+  ],
+  "last_verified": "2026-11-02"
+}

@@ -1,0 +1,28 @@
+{
+  "id": "browser-caches-chrome",
+  "title": "Chrome cache",
+  "explanation": "Chrome keeps copies of web pages and images here, plus Service Worker storage, which is site data that websites save for offline use. Chrome rebuilds its cache as you browse.",
+  "consequence": "Sites load a little slower the first time you visit them again, offline web apps may need to reload their data, and your bookmarks, passwords and history stay as they are.",
+  "paths": [
+    "~/Library/Caches/Google/Chrome",
+    "~/Library/Application Support/Google/Chrome/*/Service Worker/CacheStorage"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [
+    "com.google.Chrome"
+  ],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-11-02"
+}

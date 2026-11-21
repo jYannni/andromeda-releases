@@ -1,0 +1,22 @@
+{
+  "id": "swap-and-sleepimage",
+  "title": "Swap files",
+  "explanation": "macOS uses swap files as extra memory when apps need more than your Mac's RAM, and may keep a sleep image here too, which is usually small or absent on Apple silicon. A restart clears the swap files.",
+  "consequence": "After a restart macOS creates new swap files only when it needs them.",
+  "paths": [
+    "/System/Volumes/VM"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "restart"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://dev.to/md_ayanbag_03a42545b17ac/updating-to-macos-27-golden-gate-check-your-system-data-first-3adp"
+  ],
+  "last_verified": "2026-10-29"
+}

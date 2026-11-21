@@ -1,0 +1,25 @@
+{
+  "id": "simulator-runtimes",
+  "title": "Simulator runtimes",
+  "explanation": "These disk images hold the simulator runtimes Xcode has downloaded, one for each iOS, watchOS or other OS version. Xcode manages them in Settings › Components.",
+  "consequence": "Xcode downloads a runtime again if you need it to run a simulator.",
+  "paths": [
+    "/Library/Developer/CoreSimulator/Images"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "developer",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Remove runtimes in Xcode › Settings › Components."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://developer.apple.com/forums/thread/773153",
+    "https://furbo.org/2022/11/09/managing-xcode-downloads",
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-10-29"
+}

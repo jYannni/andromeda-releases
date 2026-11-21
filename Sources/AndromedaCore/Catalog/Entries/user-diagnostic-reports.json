@@ -1,0 +1,25 @@
+{
+  "id": "user-diagnostic-reports",
+  "title": "Crash and diagnostic reports",
+  "explanation": "macOS saves a report here each time an app crashes or hangs. New reports appear only if something goes wrong again.",
+  "consequence": "Older reports are no longer there to send to a developer.",
+  "paths": [
+    "~/Library/Logs/DiagnosticReports/*"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-11-02"
+}

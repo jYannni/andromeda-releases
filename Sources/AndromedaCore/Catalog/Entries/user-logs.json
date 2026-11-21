@@ -1,0 +1,28 @@
+{
+  "id": "user-logs",
+  "title": "App logs",
+  "explanation": "Apps write log files here to record what they did, which helps when tracking down problems. Apps start new logs the next time they run.",
+  "consequence": "Old logs are no longer there for troubleshooting, and apps keep writing new ones.",
+  "paths": [
+    "~/Library/Logs/*"
+  ],
+  "exclude": [
+    "~/Library/Logs/DiagnosticReports"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-11-02"
+}

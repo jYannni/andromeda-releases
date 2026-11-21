@@ -1,0 +1,23 @@
+{
+  "id": "mail-store",
+  "title": "Mail messages and attachments",
+  "explanation": "This is where Mail stores your messages and their attachments, and Storage settings usually counts it under Mail. Mail itself is the place to remove attachments or mailboxes.",
+  "consequence": "Attachments you remove in Mail are gone from this Mac, so save any you want to keep first.",
+  "paths": [
+    "~/Library/Mail"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "mail",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Remove attachments or mailboxes in Mail."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

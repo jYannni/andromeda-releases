@@ -1,0 +1,23 @@
+{
+  "id": "orbstack-disk",
+  "title": "OrbStack disk",
+  "explanation": "OrbStack keeps its containers, images and Linux machines inside this one disk image. The file shrinks on its own when you delete things inside OrbStack.",
+  "consequence": "Whatever you prune inside OrbStack is gone from it, and OrbStack hands the space back to macOS.",
+  "paths": [
+    "~/.orbstack/data/data.img"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Prune images and containers inside OrbStack."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://docs.orbstack.dev/faq"
+  ],
+  "last_verified": "2026-10-29"
+}

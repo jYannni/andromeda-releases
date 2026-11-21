@@ -1,0 +1,25 @@
+{
+  "id": "xcode-archives",
+  "title": "Xcode archives",
+  "explanation": "Each archive is a build you made for distribution, including the debug symbols needed to read crash reports from that build. Xcode can't recreate an archive once it's gone.",
+  "consequence": "You can no longer re-export that build or read its crash reports unless you keep its debug symbols somewhere else.",
+  "paths": [
+    "~/Library/Developer/Xcode/Archives/*"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "developer",
+  "tier": "with-care",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-11-02"
+}

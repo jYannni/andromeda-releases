@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="yes"?><!-- sparkle-sign-warning:
+IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires re-signing this file with generate_appcast or sign_update! The signed signature will be embedded at the end of this file.
+--><rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+    <channel>
+        <title>Andromeda</title>
+        <item>
+            <title>0.2.70</title>
+            <pubDate>Sat, 21 Nov 2026 12:15:14 +0200</pubDate>
+            <link>https://jyannni.github.io/andromeda-releases/</link>
+            <sparkle:version>0.2.70</sparkle:version>
+            <sparkle:shortVersionString>0.2.70</sparkle:shortVersionString>
+            <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
+            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+            <sparkle:releaseNotesLink sparkle:edSignature="/yn+ljTOj8HD4mJ3MU/GfdeUsMn6hKSAAEpTI6jGVMLnaG+MmOQDGNL/qD433KUzvs37feOaYJzWCpmbbFg+Bg==" sparkle:length="1003">https://jyannni.github.io/andromeda-releases/updates/Andromeda-0.2.70.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/jYannni/andromeda-releases/releases/download/v0.2.70/Andromeda-0.2.70.dmg" length="16149275" type="application/octet-stream" sparkle:edSignature="FV+fH7k0RnDnNrj6Zygcc6vPRvK+DrQzBoISjDicx2AN6tXQEFuYm8c7Q9QDW/k+TvA9jh/+8U0HcvamCxbpBg=="></enclosure>
+        </item>
+    </channel>
+</rss><!-- sparkle-signatures:
+edSignature: qtbTfHd7uhkd+z58n/4EfCMhzKS82f1xIzIqAr4otZcQ2oYVic1Cvd/y8ExlBSrWje30q51Go7Alokmh4GboAg==
+length: 1483
+-->

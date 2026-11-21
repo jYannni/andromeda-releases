@@ -1,0 +1,27 @@
+{
+  "id": "spotlight-index",
+  "title": "Spotlight index",
+  "explanation": "Spotlight keeps an index of your files here so searches are fast, and it is normally 1 to 10 GB. If it has grown much larger, rebuilding it with `sudo mdutil -E /System/Volumes/Data` usually brings it back down.",
+  "consequence": "Search results are incomplete for a while as Spotlight rebuilds the index in the background.",
+  "paths": [
+    "/System/Volumes/Data/.Spotlight-V100"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "terminal-command",
+    "command": "sudo mdutil -E /System/Volumes/Data"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://mjtsai.com/blog/?p=48956",
+    "https://medium.com/macoclock/how-to-debug-huge-system-data-on-macos-b2b18451c0a4"
+  ],
+  "last_verified": "2026-11-02"
+}

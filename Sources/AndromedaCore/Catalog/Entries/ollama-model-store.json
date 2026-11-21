@@ -1,0 +1,25 @@
+{
+  "id": "ollama-model-store",
+  "title": "Ollama models",
+  "explanation": "Ollama keeps downloaded and custom models in this folder by default. Models can share files, so the folder size doesn't tell you how much space removing one model will free.",
+  "consequence": "A removed model is unavailable locally until you download or recreate it.",
+  "paths": [
+    "~/.ollama/models"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "system-data",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Use Ollama's command-line tools to list and remove individual models.",
+    "url": "https://docs.ollama.com/cli#remove-a-model"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://docs.ollama.com/faq#where-are-models-stored",
+    "https://docs.ollama.com/cli"
+  ],
+  "last_verified": "2026-11-15"
+}

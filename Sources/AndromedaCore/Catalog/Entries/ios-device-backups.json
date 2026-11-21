@@ -1,0 +1,23 @@
+{
+  "id": "ios-device-backups",
+  "title": "iPhone and iPad backups",
+  "explanation": "These are full local backups of your iPhone or iPad, made by Finder. Finder's Manage Backups list shows which device and date each one belongs to.",
+  "consequence": "A removed backup can't be used to restore that device, so keep at least one recent backup.",
+  "paths": [
+    "~/Library/Application Support/MobileSync/Backup/*"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "ios-files",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Finder › your device › Manage Backups."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://support.apple.com/108809"
+  ],
+  "last_verified": "2026-10-29"
+}

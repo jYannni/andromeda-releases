@@ -1,0 +1,24 @@
+{
+  "id": "icloud-drive-local",
+  "title": "iCloud Drive downloads",
+  "explanation": "These are local copies of files in iCloud Drive, kept so they open instantly. Removing a download keeps the file in iCloud and leaves a placeholder you can open later.",
+  "consequence": "The file downloads again the next time you open it, which needs an internet connection.",
+  "paths": [
+    "~/Library/Mobile Documents"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "icloud-drive",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Right-click files in iCloud Drive › Remove Download."
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://mjtsai.com/blog/?p=48956",
+    "https://eclecticlight.co/2025/12/20/explainer-storage-settings/"
+  ],
+  "last_verified": "2026-10-29"
+}

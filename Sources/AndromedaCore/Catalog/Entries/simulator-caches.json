@@ -1,0 +1,27 @@
+{
+  "id": "simulator-caches",
+  "title": "Simulator caches",
+  "explanation": "The simulator keeps caches here so devices and apps start faster. The simulator rebuilds them the next time it needs them.",
+  "consequence": "The next simulator launch may take a little longer while the caches rebuild.",
+  "paths": [
+    "~/Library/Developer/CoreSimulator/Caches"
+  ],
+  "sizing": "allocated-walk",
+  "bucket": "developer",
+  "tier": "safe",
+  "removal": {
+    "kind": "trash"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [
+    26,
+    27
+  ],
+  "sources": [
+    "https://developer.apple.com/forums/thread/773153",
+    "https://furbo.org/2022/11/09/managing-xcode-downloads",
+    "https://mjtsai.com/blog/?p=48956"
+  ],
+  "last_verified": "2026-11-02"
+}
