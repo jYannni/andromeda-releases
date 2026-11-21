@@ -34,6 +34,19 @@ VERSION="$(tr -d '[:space:]' < VERSION)"
 [ -n "$VERSION" ] || die "VERSION is empty"
 feed="${ANDROMEDA_UPDATE_FEED_URL:-${DISKPLAIN_UPDATE_FEED_URL:-}}"
 public_key="${ANDROMEDA_UPDATE_PUBLIC_KEY:-${DISKPLAIN_UPDATE_PUBLIC_KEY:-}}"
+channel="${ANDROMEDA_RELEASE_CHANNEL:-}"
+if [ "$TRACE" = 1 ] || [ "$VERIFY" = 1 ]; then
+    channel=development
+elif [ -z "$channel" ]; then
+    case "$feed" in
+        https://jyannni.github.io/andromeda-releases/updates/appcast.xml) channel=public-release ;;
+        *) channel=private-beta ;;
+    esac
+fi
+case "$channel" in
+    private-beta|public-release|development) ;;
+    *) die "Set ANDROMEDA_RELEASE_CHANNEL to private-beta, public-release, or development" ;;
+esac
 if [ -n "$feed" ] || [ -n "$public_key" ]; then
     [[ "$feed" =~ ^https://[^/?#@[:space:]]+/[^?#[:space:]]+$ ]] || die "Set ANDROMEDA_UPDATE_FEED_URL to an HTTPS appcast URL"
     [[ "$public_key" =~ ^[A-Za-z0-9+/]{43}=$ ]] || die "Set ANDROMEDA_UPDATE_PUBLIC_KEY to the Sparkle EdDSA public key"
@@ -61,6 +74,7 @@ plutil -lint "$worker_plist"
 [ "$(plutil -extract BundleProgram raw "$worker_plist")" = "Contents/MacOS/diskplain-automation-worker" ] \
     || die "wrong automation worker bundle path"
 sed "s/__VERSION__/$VERSION/g" "$ROOT/Resources/App/Info.plist" > "$APP/Contents/Info.plist"
+plutil -insert AndromedaReleaseChannel -string "$channel" "$APP/Contents/Info.plist"
 if [ -n "$feed" ]; then
     plutil -insert SUFeedURL -string "$feed" "$APP/Contents/Info.plist"
     plutil -insert SUPublicEDKey -string "$public_key" "$APP/Contents/Info.plist"

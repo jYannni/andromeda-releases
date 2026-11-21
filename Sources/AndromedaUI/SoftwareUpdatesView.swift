@@ -1,20 +1,45 @@
 import Sparkle
 import SwiftUI
 
+enum ReleaseChannel: String {
+    case privateBeta = "private-beta"
+    case publicRelease = "public-release"
+    case development
+
+    var label: String {
+        switch self {
+        case .privateBeta: "Private Beta"
+        case .publicRelease: "Public Release"
+        case .development: "Development Build"
+        }
+    }
+
+    static func installed(in info: [String: Any]) -> Self? {
+        if let value = info["AndromedaReleaseChannel"] as? String {
+            return Self(rawValue: value)
+        }
+        return info["CFBundleVersion"] == nil ? .development : nil
+    }
+}
+
 struct SoftwareUpdatesView: View {
     let updater: SPUUpdater?
     var showVersionHistory: (() -> Void)?
 
     var body: some View {
+        let info = Bundle.main.infoDictionary ?? [:]
+        let channel = ReleaseChannel.installed(in: info)
         VStack(alignment: .leading, spacing: 12) {
             SectionHeading(title: "Software Updates", symbol: "arrow.trianglehead.clockwise", tint: .blue)
-            if let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String {
+            if let version = info["CFBundleShortVersionString"] as? String {
                 Text("Installed version \(version)").font(.callout)
             }
+            LabeledContent("Release channel", value: channel?.label ?? "Unspecified")
+                .font(.callout)
             if let updater {
                 ConfiguredUpdateControls(updater: updater)
             } else {
-                Text("Update checks are unavailable in this build. Install the next beta from its disk image.")
+                Text("Update checks are unavailable in this build. Install a newer version from its disk image.")
                     .font(.callout).foregroundStyle(.secondary)
             }
             if let showVersionHistory {
