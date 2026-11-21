@@ -4,18 +4,18 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>Andromeda</title>
         <item>
-            <title>0.2.70</title>
-            <pubDate>Sat, 21 Nov 2026 12:15:14 +0200</pubDate>
+            <title>0.2.71</title>
+            <pubDate>Sat, 21 Nov 2026 12:33:14 +0200</pubDate>
             <link>https://jyannni.github.io/andromeda-releases/</link>
-            <sparkle:version>0.2.70</sparkle:version>
-            <sparkle:shortVersionString>0.2.70</sparkle:shortVersionString>
+            <sparkle:version>0.2.71</sparkle:version>
+            <sparkle:shortVersionString>0.2.71</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <sparkle:releaseNotesLink sparkle:edSignature="/yn+ljTOj8HD4mJ3MU/GfdeUsMn6hKSAAEpTI6jGVMLnaG+MmOQDGNL/qD433KUzvs37feOaYJzWCpmbbFg+Bg==" sparkle:length="1003">https://jyannni.github.io/andromeda-releases/updates/Andromeda-0.2.70.md</sparkle:releaseNotesLink>
-            <enclosure url="https://github.com/jYannni/andromeda-releases/releases/download/v0.2.70/Andromeda-0.2.70.dmg" length="16149275" type="application/octet-stream" sparkle:edSignature="FV+fH7k0RnDnNrj6Zygcc6vPRvK+DrQzBoISjDicx2AN6tXQEFuYm8c7Q9QDW/k+TvA9jh/+8U0HcvamCxbpBg=="></enclosure>
+            <sparkle:releaseNotesLink sparkle:edSignature="8F2y79FlS+C1EOQ0QHKGsWQK/WZvKNd5g3FyTQ/IiocvLVp3nXGx9Dy6JYfeCo9SAuyWoqWa5u5UQYl+kkbeCg==" sparkle:length="528">https://jyannni.github.io/andromeda-releases/updates/Andromeda-0.2.71.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/jYannni/andromeda-releases/releases/download/v0.2.71/Andromeda-0.2.71.dmg" length="16098871" type="application/octet-stream" sparkle:edSignature="+RvSnsi2c5yUqjmCBiFj81vK9II8IM/oo/Ul66nfsypLd2zUE8jmBmFvETLwwMAqGInaXRGJzU8x/E63aWdgBQ=="></enclosure>
         </item>
     </channel>
 </rss><!-- sparkle-signatures:
-edSignature: qtbTfHd7uhkd+z58n/4EfCMhzKS82f1xIzIqAr4otZcQ2oYVic1Cvd/y8ExlBSrWje30q51Go7Alokmh4GboAg==
-length: 1483
+edSignature: u+9OQwr06OPTzWcgvZvG1Qdci3Uh6KFZT8rhQsgj8bVPwQ99jPUV2kIzeJJDrbc6+Wv1KUHhONMRlIbhlNliDw==
+length: 1482
 -->
