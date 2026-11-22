@@ -1,9 +1,9 @@
-<?xml version="1.0" standalone="yes"?><!-- sparkle-sign-warning:
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><!-- sparkle-sign-warning:
 IMPORTANT: This file was signed by Sparkle. Any modifications to this file requires re-signing this file with generate_appcast or sign_update! The signed signature will be embedded at the end of this file.
 --><rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
     <channel>
         <title>Andromeda</title>
-        <item>
+        <item><title>0.2.73</title><pubDate>Sun, 22 Nov 2026 16:04:11 +0200</pubDate><link>https://jyannni.github.io/andromeda-releases/</link><sparkle:version>0.2.73</sparkle:version><sparkle:shortVersionString>0.2.73</sparkle:shortVersionString><sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion><sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements><sparkle:channel>public-beta</sparkle:channel><sparkle:releaseNotesLink sparkle:edSignature="wgKRt1bSap1Ex+cim+qWJMag+IlTMCYuFG6ghhOV8UBg3xkpBpJKtBQF/A0f7Ut60eKXy4Eeg35208D924+WDA==" sparkle:length="779">https://jyannni.github.io/andromeda-releases/updates/Andromeda-0.2.73-public-beta.md</sparkle:releaseNotesLink><enclosure url="https://github.com/jYannni/andromeda-releases/releases/download/v0.2.73-public-beta/Andromeda-0.2.73-public-beta.dmg" length="16201074" type="application/octet-stream" sparkle:edSignature="QT1yRdd9wIIkjdbVYoxs/OpOUy+690LPRTx4X7RkYZN62F8VWV/tBvCUW0zk4BWOASk/2NAid0gX1/ULMVjaDQ=="></enclosure></item><item>
             <title>0.2.71</title>
             <pubDate>Sat, 21 Nov 2026 12:33:14 +0200</pubDate>
             <link>https://jyannni.github.io/andromeda-releases/</link>
@@ -16,6 +16,6 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
         </item>
     </channel>
 </rss><!-- sparkle-signatures:
-edSignature: u+9OQwr06OPTzWcgvZvG1Qdci3Uh6KFZT8rhQsgj8bVPwQ99jPUV2kIzeJJDrbc6+Wv1KUHhONMRlIbhlNliDw==
-length: 1482
+edSignature: 7jFr/gAGjeuExkeR0akt2N+Z5aphMh3pXE37nMqEeZhLiXnDE2IpsXMTW3sN0i4wNWEHX6d3o8B9APh9V84cCQ==
+length: 2498
 -->
