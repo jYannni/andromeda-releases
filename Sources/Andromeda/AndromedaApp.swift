@@ -158,7 +158,10 @@ struct AndromedaApp: App {
                     showsAutomationMenu = $0
                     lifecycle.updateAutomationMenu(shown: $0)
                 }
-            ), showVersionHistory: updates.showVersionHistory)
+            ), showVersionHistory: updates.showVersionHistory, receivesPublicBetas: updates.offersPublicBetas ? Binding(
+                get: { updates.receivesPublicBetas },
+                set: updates.setReceivesPublicBetas
+            ) : nil)
             .windowResizeBehavior(.enabled)
         }
         .defaultSize(width: 730, height: 640)

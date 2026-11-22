@@ -32,21 +32,14 @@ source "$ROOT/scripts/lib/signing-checks.sh"
 
 VERSION="$(tr -d '[:space:]' < VERSION)"
 [ -n "$VERSION" ] || die "VERSION is empty"
-feed="${ANDROMEDA_UPDATE_FEED_URL:-${DISKPLAIN_UPDATE_FEED_URL:-}}"
 public_key="${ANDROMEDA_UPDATE_PUBLIC_KEY:-${DISKPLAIN_UPDATE_PUBLIC_KEY:-}}"
-channel="${ANDROMEDA_RELEASE_CHANNEL:-}"
+# shellcheck source=lib/release-channel.sh
+source "$ROOT/scripts/lib/release-channel.sh"
 if [ "$TRACE" = 1 ] || [ "$VERIFY" = 1 ]; then
     channel=development
-elif [ -z "$channel" ]; then
-    case "$feed" in
-        https://jyannni.github.io/andromeda-releases/updates/appcast.xml) channel=public-release ;;
-        *) channel=private-beta ;;
-    esac
+else
+    APP="$app_output"
 fi
-case "$channel" in
-    private-beta|public-release|development) ;;
-    *) die "Set ANDROMEDA_RELEASE_CHANNEL to private-beta, public-release, or development" ;;
-esac
 if [ -n "$feed" ] || [ -n "$public_key" ]; then
     [[ "$feed" =~ ^https://[^/?#@[:space:]]+/[^?#[:space:]]+$ ]] || die "Set ANDROMEDA_UPDATE_FEED_URL to an HTTPS appcast URL"
     [[ "$public_key" =~ ^[A-Za-z0-9+/]{43}=$ ]] || die "Set ANDROMEDA_UPDATE_PUBLIC_KEY to the Sparkle EdDSA public key"
@@ -75,6 +68,7 @@ plutil -lint "$worker_plist"
     || die "wrong automation worker bundle path"
 sed "s/__VERSION__/$VERSION/g" "$ROOT/Resources/App/Info.plist" > "$APP/Contents/Info.plist"
 plutil -insert AndromedaReleaseChannel -string "$channel" "$APP/Contents/Info.plist"
+plutil -replace CFBundleDisplayName -string "$display_name" "$APP/Contents/Info.plist"
 if [ -n "$feed" ]; then
     plutil -insert SUFeedURL -string "$feed" "$APP/Contents/Info.plist"
     plutil -insert SUPublicEDKey -string "$public_key" "$APP/Contents/Info.plist"
@@ -92,7 +86,12 @@ fi
 # Liquid Glass Assets.car plus a flat AppIcon.icns for older surfaces.
 step "app icon"
 ICON_OUT="$(mktemp -d)"
-xcrun actool "$ROOT/Resources/App/AppIcon.icon" --compile "$ICON_OUT" --platform macosx \
+icon_document="$ROOT/Resources/App/AppIcon.icon"
+if [ "$channel" = public-beta ] || [ "$channel" = private-beta ]; then
+    icon_document="$ICON_OUT/AppIcon.icon"
+    python3 scripts/stage-beta-icon.py "$ROOT/Resources/App" "$icon_document" "$channel"
+fi
+xcrun actool "$icon_document" --compile "$ICON_OUT" --platform macosx \
     --minimum-deployment-target 26.0 --app-icon AppIcon --output-partial-info-plist "$ICON_OUT/partial.plist" >/dev/null \
     || die "actool could not compile Resources/App/AppIcon.icon"
 [ -f "$ICON_OUT/Assets.car" ] && [ -f "$ICON_OUT/AppIcon.icns" ] || die "actool produced no icon"
@@ -109,6 +108,11 @@ for b in "${bundles[@]}"; do
     chmod -R a+rX "$APP/Contents/Resources/${b##*/}"
 done
 [ -d "$APP/Contents/Resources/Andromeda_AndromedaCore.bundle" ] || die "Andromeda_AndromedaCore.bundle missing"
+if [ "$channel" != development ]; then
+    history="$APP/Contents/Resources/Andromeda_AndromedaAppModel.bundle/Contents/Resources/Releases.json"
+    [ -f "$history" ] || die "Bundled release history is missing"
+    python3 scripts/release-notes.py "$channel" "$VERSION" "$history" "build/Andromeda-${VERSION}${release_suffix}.md"
+fi
 ls "$APP/Contents/Resources"
 
 step "embed Sparkle"

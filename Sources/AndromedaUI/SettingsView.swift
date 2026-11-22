@@ -10,6 +10,7 @@ public struct SettingsView: View {
     let model: AppModel
     let updater: SPUUpdater?
     let showVersionHistory: (() -> Void)?
+    let receivesPublicBetas: Binding<Bool>?
     let showsAutomationMenu: Binding<Bool>?
     @State private var helperSheet = false
     @State private var confirmRemove = false
@@ -44,10 +45,11 @@ public struct SettingsView: View {
     }
 
     public init(model: AppModel, updater: SPUUpdater? = nil, showsAutomationMenu: Binding<Bool>? = nil,
-                showVersionHistory: (() -> Void)? = nil) {
+                showVersionHistory: (() -> Void)? = nil, receivesPublicBetas: Binding<Bool>? = nil) {
         self.model = model
         self.updater = updater
         self.showVersionHistory = showVersionHistory
+        self.receivesPublicBetas = receivesPublicBetas
         self.showsAutomationMenu = showsAutomationMenu
     }
 
@@ -156,7 +158,8 @@ public struct SettingsView: View {
                 StorageMonitoringSettingsView(model: model)
             }
             .card()
-        case .updates: SoftwareUpdatesView(updater: updater, showVersionHistory: showVersionHistory)
+        case .updates: SoftwareUpdatesView(updater: updater, showVersionHistory: showVersionHistory,
+                                           receivesPublicBetas: receivesPublicBetas)
         }
     }
 

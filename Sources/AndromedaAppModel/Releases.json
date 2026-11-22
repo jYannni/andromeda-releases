@@ -1,5 +1,30 @@
 [
   {
+    "version": "0.2.73",
+    "date": "2026-11-22",
+    "sections": [
+      {"title": "Added", "items": [
+        "Public Beta has a blue galaxy icon with PUBLIC and BETA badges. Private Beta has a violet galaxy icon with a tilted grid and PRIVATE and BETA badges."
+      ]},
+      {"title": "Changed", "items": [
+        "Open What’s New from the link beside Software Updates."
+      ]}
+    ]
+  },
+  {
+    "version": "0.2.72",
+    "date": "2026-11-22",
+    "sections": [
+      {"title": "Added", "items": [
+        "Opt in to public beta updates in Settings → Updates on public builds.",
+        "What’s New groups changes into the releases published for your build’s channel."
+      ]},
+      {"title": "Fixed", "items": [
+        "Update checks use the feed configured by the signed app, even when an older DiskPlain beta saved a different feed in shared preferences."
+      ]}
+    ]
+  },
+  {
     "version": "0.2.71",
     "date": "2026-11-21",
     "sections": [

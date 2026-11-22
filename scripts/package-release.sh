@@ -4,14 +4,19 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 
 usage() {
-    printf 'Usage: %s prepare | notarize <keychain-profile>\n' "$0" >&2
+    printf 'Usage: %s <public-release|public-beta|private-beta> prepare | notarize <keychain-profile>\n' "$0" >&2
     exit 2
 }
 
 version="$(tr -d '[:space:]' < VERSION)"
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Invalid release version" >&2; exit 1; }
-candidate="Andromeda-${version}-candidate.dmg"
-release="Andromeda-${version}.dmg"
+case "${1:-}" in public-release|public-beta|private-beta) export ANDROMEDA_RELEASE_CHANNEL="$1" ;; *) usage ;; esac
+shift
+# shellcheck source=lib/release-channel.sh
+source scripts/lib/release-channel.sh
+release_base="Andromeda-${version}${release_suffix}"
+candidate="${release_base}-candidate.dmg"
+release="${release_base}.dmg"
 case "${1:-}" in
     prepare) [ "$#" -eq 1 ] || usage ;;
     notarize) [ "$#" -eq 2 ] && [ -n "$2" ] || usage ;;
@@ -24,7 +29,7 @@ trap 'rm -rf "$stage"' EXIT
 if [ "$1" = prepare ]; then
     [ ! -e "build/$candidate" ] || { echo "build/$candidate already exists" >&2; exit 1; }
     scripts/build-app.sh
-    app=build/Andromeda.app
+    app="$app_output"
     identity="$(codesign -dv --verbose=4 "$app" 2>&1 | sed -n 's/^Authority=\(Developer ID Application: .*\)$/\1/p')"
     [ -n "$identity" ] || { echo "The app has no Developer ID Application signature" >&2; exit 1; }
 
@@ -43,7 +48,7 @@ else
     }
     cp "build/$candidate" "$stage/$release"
     codesign --verify --strict "$stage/$release"
-    result="build/Andromeda-${version}-notary.json"
+    result="build/${release_base}-notary.json"
     if ! xcrun notarytool submit "$stage/$release" --keychain-profile "$2" --wait --output-format json > "$result"; then
         echo "Notarization failed. See $result" >&2
         exit 1

@@ -11,13 +11,22 @@ import SwiftUI
 final class UpdateController: NSObject, SPUUpdaterDelegate, SPUStandardUserDriverDelegate {
     @ObservationIgnored private var controller: SPUStandardUpdaterController?
     @ObservationIgnored private var started = false
-    @ObservationIgnored private var feedContext: [String]?
+    @ObservationIgnored private var feedConfiguration: [String]?
+    @ObservationIgnored private var enrollsInPublicBetaOnFirstLaunch = false
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private var historyWindow: NSWindow?
     private static let availabilityKey = "io.github.jyannni.diskplain.available-update"
+    private static let publicBetaKey = "io.github.jyannni.diskplain.receive-public-betas"
+    private static let publicBetaChannel = "public-beta"
 
     private(set) var updateAvailable = false
+    private(set) var receivesPublicBetas = false
+    private(set) var offersPublicBetas = false
     var updater: SPUUpdater? { controller?.updater }
+
+    private var feedContext: [String]? {
+        feedConfiguration.map { $0 + (receivesPublicBetas ? [Self.publicBetaChannel] : []) }
+    }
 
     init(bundle: Bundle = .main, defaults: UserDefaults = .standard) {
         self.defaults = defaults
@@ -31,11 +40,14 @@ final class UpdateController: NSObject, SPUUpdaterDelegate, SPUStandardUserDrive
               settings["SUVerifyUpdateBeforeExtraction"] as? Bool == true else {
             return
         }
-        if let build = settings["CFBundleVersion"] as? String {
-            let context = [build, feed, key]
-            feedContext = context
-            updateAvailable = defaults.stringArray(forKey: Self.availabilityKey) == context
-        }
+        let channel = settings["AndromedaReleaseChannel"] as? String
+        offersPublicBetas = channel == "public-release" || channel == Self.publicBetaChannel
+        enrollsInPublicBetaOnFirstLaunch = channel == Self.publicBetaChannel
+            && defaults.object(forKey: Self.publicBetaKey) == nil
+        receivesPublicBetas = offersPublicBetas
+            && (defaults.bool(forKey: Self.publicBetaKey) || enrollsInPublicBetaOnFirstLaunch)
+        feedConfiguration = [feed, key, settings["CFBundleVersion"] as? String ?? "", channel ?? ""]
+        updateAvailable = feedContext == defaults.stringArray(forKey: Self.availabilityKey)
         controller = SPUStandardUpdaterController(
             startingUpdater: false, updaterDelegate: self, userDriverDelegate: self)
     }
@@ -43,11 +55,31 @@ final class UpdateController: NSObject, SPUUpdaterDelegate, SPUStandardUserDrive
     func start() {
         guard let controller, !started else { return }
         started = true
+        if enrollsInPublicBetaOnFirstLaunch { defaults.set(true, forKey: Self.publicBetaKey) }
+        controller.updater.clearFeedURLFromUserDefaults()
         controller.startUpdater()
     }
 
     func showUpdate() {
         controller?.checkForUpdates(nil)
+    }
+
+    func setReceivesPublicBetas(_ value: Bool) {
+        guard offersPublicBetas, value != receivesPublicBetas,
+              let updater, !updater.sessionInProgress else { return }
+        receivesPublicBetas = value
+        defaults.set(value, forKey: Self.publicBetaKey)
+        setAvailability(false)
+        updater.resetUpdateCycleAfterShortDelay()
+    }
+
+    func feedURLString(for updater: SPUUpdater) -> String? {
+        // The signed build's feed takes precedence over old shared Sparkle preferences.
+        feedConfiguration?.first
+    }
+
+    func allowedChannels(for updater: SPUUpdater) -> Set<String> {
+        receivesPublicBetas ? [Self.publicBetaChannel] : []
     }
 
     func showVersionHistory() {
