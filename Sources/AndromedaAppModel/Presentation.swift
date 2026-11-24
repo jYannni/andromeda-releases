@@ -158,9 +158,9 @@ public struct OverviewSummary: Equatable, Sendable {
     public let totalsUnknownNote: String?
     public let unaccountedText: String?
     public let spaceBreakdown: SpaceBreakdown?
-    public let quickWins: [ItemRow]
+    public let cleanupSuggestions: CleanupSuggestions
     /// "Could be online-only: …" for the cloud providers already checked (ruling P8). Nil when none
-    /// is checked or they suggest nothing. Never one of the quick wins (ruling V1 keeps those to Trash moves).
+    /// is checked or they suggest nothing. Shown separately from suggestions that move items to Trash.
     public let onlineOnlyText: String?
     public let cards: [ExplainerCard]
     public let couldntCheck: [ItemRow]
@@ -204,11 +204,7 @@ public enum Presentation {
     /// `onlineOnly` is the summed "frees at least" of the checked cloud providers (`CloudModel.onlineOnlyTotal`).
     public static func overview(_ r: ScanResult, helperReady: Bool, onlineOnly: Int64? = nil) -> OverviewSummary {
         let sized = r.findings.map { (finding: $0, row: row($0, r, helperReady)) }
-        let quickWins = sized.filter {
-            guard case .trash = $0.finding.entry.removal else { return false }  // ruling V1: commands promise no size
-            return $0.row.selectable && ($0.finding.bytes ?? 0) > 0
-        }
-            .sorted(by: ranksBefore).prefix(3).map(\.row)
+        let cleanupSuggestions = CleanupSuggestions(ranked: sized.sorted(by: ranksBefore), scan: r)
         let couldntCheck = sized.filter(\.row.couldntCheck).sorted(by: ranksBefore).map(\.row)
 
         var usedText: String?
@@ -275,7 +271,7 @@ public enum Presentation {
         return OverviewSummary(
             usedText: usedText, gauge: gauge, foundText: foundText, allocationNote: allocationNote,
             bar: bar, purgeableText: purgeableText, totalsUnknownNote: unknownNote, unaccountedText: unaccountedText,
-            spaceBreakdown: spaceBreakdown, quickWins: Array(quickWins),
+            spaceBreakdown: spaceBreakdown, cleanupSuggestions: cleanupSuggestions,
             onlineOnlyText: onlineOnly.flatMap { $0 > 0 ? Copy.Organize.couldBeOnlineOnly(ByteFormat.string($0)) : nil },
             cards: cards(r), couldntCheck: couldntCheck)
     }
@@ -355,9 +351,10 @@ public enum Presentation {
         let removable = e.tier == .safe || e.tier == .withCare
         let better = PlanBuilder.betterAction(for: f, helperReady: helperReady, osMajor: r.env.osMajor)
 
+        let simulatorDevices = e.id == SimulatorInventory.Group.devices.rawValue
         let selectable: Bool
         switch e.removal {
-        case .trash, .tool, .deleteLocalSnapshots: selectable = f.verdict.actionable
+        case .trash, .tool, .deleteLocalSnapshots: selectable = f.verdict.actionable && !simulatorDevices
         default: selectable = false
         }
 

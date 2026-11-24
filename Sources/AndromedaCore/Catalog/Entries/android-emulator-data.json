@@ -1,0 +1,23 @@
+{
+  "id": "android-emulator-data",
+  "title": "Android virtual device data",
+  "explanation": "Android Emulator stores virtual devices in ~/.android/avd by default. This folder can contain installed apps, device data and snapshots.",
+  "consequence": "Deleting a virtual device removes its saved apps and data.",
+  "paths": ["~/.android/avd"],
+  "sizing": "allocated-walk",
+  "bucket": "developer",
+  "tier": "leave-it",
+  "removal": {
+    "kind": "handoff",
+    "instructions": "Review virtual devices in Android Studio › Device Manager before deleting any.",
+    "url": "https://developer.android.com/studio/run/managing-avds"
+  },
+  "apps_must_be_quit": [],
+  "requires_tool": null,
+  "verified_on": [],
+  "sources": [
+    "https://developer.android.com/tools/variables#envar",
+    "https://developer.android.com/studio/run/managing-avds"
+  ],
+  "last_verified": "2026-11-22"
+}

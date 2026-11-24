@@ -16,6 +16,8 @@ struct CleanupSpaceMeter {
     func startupActions(_ plan: RemovalPlan) -> Set<UUID> {
         guard let disk = startupDisk else { return [] }
         return Set(plan.removals.compactMap { item in
+            if item.catalogEntryID.hasPrefix("maintenance-") { return nil }
+            if case .removeOllamaModel = item.action { return nil }
             if case .moveToTrash(let url) = item.action, FileIdentity(path: url.path)?.dev != disk.dev { return nil }
             return item.id
         })

@@ -26,18 +26,24 @@ struct FolderStorageView: View {
     let ui: UIState
     private let startAtHome: Bool
     private let findsInstallers: Bool
+    private let tool: ToolPage?
     @State private var state: FolderStorageState
     @State private var pinUnavailable = false
     @State private var isDropTargeted = false
     @State private var dropUnavailable = false
 
-    init(model: AppModel, ui: UIState, startAtHome: Bool = false, installerFolder: URL? = nil) {
+    init(model: AppModel, ui: UIState, startAtHome: Bool = false, installerFolder: URL? = nil, tool: ToolPage? = nil) {
         self.model = model
         self.ui = ui
         self.startAtHome = startAtHome
+        self.tool = tool
         findsInstallers = installerFolder != nil
-        _state = State(initialValue: installerFolder.map { FolderStorageState(folder: $0) }
-            ?? (startAtHome ? ui.storageMapBrowser : ui.folderBrowser))
+        if tool != nil {
+            _state = State(initialValue: FolderStorageState())
+        } else {
+            _state = State(initialValue: installerFolder.map { FolderStorageState(folder: $0) }
+                ?? (startAtHome ? ui.storageMapBrowser : ui.folderBrowser))
+        }
     }
 
     private var folder: URL? { state.folder ?? (startAtHome ? model.scanHome : nil) }
@@ -48,7 +54,8 @@ struct FolderStorageView: View {
                 let homeMap = startAtHome && folder == model.scanHome
                 let folderName = folder.lastPathComponent.isEmpty ? folder.path : folder.lastPathComponent
                 StorageBrowserView(
-                    model: model, title: findsInstallers ? "Installer Files" : homeMap ? "Storage Map" : folderName,
+                    model: model, title: findsInstallers ? "Installer Files" : homeMap ? "Storage Map"
+                        : tool == .largeFiles ? "Large and Old Files" : folderName,
                     subtitle: homeMap ? "Explore space used by local files in your home folder." : folder.path,
                     scope: model.storageFolderScope(folder, reference: state.reference),
                     openPlan: { ui.destination = .spacePlan },
@@ -68,8 +75,10 @@ struct FolderStorageView: View {
             } else {
                 PageColumn {
                     PageHeader(
-                        title: "Scan a Folder", subtitle: "See what uses space inside one folder.",
+                        title: tool == .downloads ? "Downloads" : tool == .largeFiles ? "Large and Old Files" : "Scan a Folder",
+                        subtitle: "See what uses space inside one folder.",
                         symbol: "folder.fill") {
+                        if tool != nil { ToolBackButton(ui: ui) }
                         shortcutMenu
                         Button("Choose Folder…", action: chooseFolder)
                     }
@@ -80,6 +89,19 @@ struct FolderStorageView: View {
             }
         }
         .contentShape(Rectangle())
+        .task {
+            guard state.folder == nil, let tool else { return }
+            let url = tool == .downloads ? model.scanHome.appendingPathComponent("Downloads", isDirectory: true) : model.scanHome
+            let reference = try? await BackgroundWork.run("andromeda.tools.folder") { Self.localFolderReference(url) }
+            guard let reference,
+                  !Task.isCancelled, state.folder == nil else { return }
+            openFolder(url, reference: reference, allowFileReview: tool == .downloads)
+            if tool == .largeFiles {
+                state.presentation.navigation.size = .hundredMB
+                state.presentation.navigation.age = .accessed(.quarter)
+                state.presentation.navigation.kind = .files
+            }
+        }
         .dropDestination(for: URL.self) { urls, _ in
             guard urls.count == 1, let url = urls.first else {
                 dropUnavailable = true

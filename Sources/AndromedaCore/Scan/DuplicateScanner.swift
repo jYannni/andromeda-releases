@@ -339,9 +339,12 @@ public enum DuplicateScanner {
     }
 
     static func matchesTrashFingerprint(at url: URL, info: stat, digest: Data) -> Bool {
+        fullDigest(at: url, info: info, control: ScanControl { _ in }) == digest
+    }
+
+    static func fullDigest(at url: URL, info: stat, control: ScanControl) -> Data? {
         let candidate = Candidate(url: url, identity: FileIdentity(dev: info.st_dev, ino: info.st_ino),
                                   bytes: info.st_size)
-        guard let fingerprint = fingerprint(candidate, control: ScanControl { _ in }) else { return false }
-        return Data(fingerprint.digest) == digest
+        return fingerprint(candidate, control: control).map { Data($0.digest) }
     }
 }

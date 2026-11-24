@@ -28,6 +28,8 @@ public struct ScanResult: Equatable, Sendable {
     var applicationIDsByPath: [URL: String]
     /// Allocated bytes in home that no catalog entry or large item lists, per probable bucket.
     public var unlisted: [AppleBucket: Int64]
+    /// The Downloads total captured by the home walk when it could measure the whole local folder.
+    public var downloadsBytes: Int64?
     /// The helper was on for this scan; picks the reason copy.
     public var helperOn: Bool
     /// The helper refused other accounts' sizes because this user isn't an administrator.
@@ -40,7 +42,7 @@ public struct ScanResult: Equatable, Sendable {
         usedKnown: Bool, fda: FDAStatus, reconciliation: Reconciliation, finishedAt: Date,
         rootMeasureTruncated: Set<String> = [], appItems: [AppItem] = [], unlisted: [AppleBucket: Int64] = [:],
         helperOn: Bool = false, standardUser: Bool = false, snapshots: [LocalSnapshot]? = nil,
-        applicationIDsByPath: [URL: String] = [:], nestedAppItems: [AppItem] = []
+        applicationIDsByPath: [URL: String] = [:], nestedAppItems: [AppItem] = [], downloadsBytes: Int64? = nil
     ) {
         self.env = env
         self.findings = findings
@@ -55,6 +57,7 @@ public struct ScanResult: Equatable, Sendable {
         self.nestedAppItems = nestedAppItems
         self.applicationIDsByPath = applicationIDsByPath
         self.unlisted = unlisted
+        self.downloadsBytes = downloadsBytes
         self.helperOn = helperOn
         self.standardUser = standardUser
         self.snapshots = snapshots

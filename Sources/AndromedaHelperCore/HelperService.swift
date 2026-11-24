@@ -10,6 +10,7 @@ import AndromedaHelperProtocol
 public final class HelperService: NSObject, AndromedaHelperXPC, @unchecked Sendable {
     private let measureOp: @Sendable (String, uid_t) -> Result<MeasureReply, HelperErrorCode>
     private let spotlightOp: @Sendable () -> HelperErrorCode?
+    private let dnsOp: @Sendable () -> HelperErrorCode?
     private let otherAccountsOp: @Sendable (uid_t) -> Result<[AccountSizeReply], HelperErrorCode>
     private let queue = DispatchQueue(label: "\(HelperIdentity.helperBundleID).work")
     private let log = Logger(subsystem: HelperIdentity.helperBundleID, category: "service")
@@ -27,17 +28,25 @@ public final class HelperService: NSObject, AndromedaHelperXPC, @unchecked Senda
         self.init(
             measure: { measure.run(entryIDRaw: $0, callerUID: $1) },
             rebuildSpotlight: { spotlight.run() },
-            measureOtherAccounts: { otherAccounts.run(callerUID: $0) })
+            measureOtherAccounts: { otherAccounts.run(callerUID: $0) },
+            flushDNS: {
+                let runner = LiveCommandRunner()
+                guard runner.run(.flushDNSDirectoryCache).exitCode == 0 else { return .toolFailed }
+                if runner.run(.flushMulticastDNSCache).exitCode == 0 { return nil }
+                return runner.run(.flushLegacyMulticastDNSCache).exitCode == 0 ? nil : .toolFailed
+            })
     }
 
     /// Test seam: inject the operations.
     init(
         measure: @escaping @Sendable (String, uid_t) -> Result<MeasureReply, HelperErrorCode>,
         rebuildSpotlight: @escaping @Sendable () -> HelperErrorCode?,
-        measureOtherAccounts: @escaping @Sendable (uid_t) -> Result<[AccountSizeReply], HelperErrorCode>
+        measureOtherAccounts: @escaping @Sendable (uid_t) -> Result<[AccountSizeReply], HelperErrorCode>,
+        flushDNS: @escaping @Sendable () -> HelperErrorCode? = { .toolFailed }
     ) {
         self.measureOp = measure
         self.spotlightOp = rebuildSpotlight
+        self.dnsOp = flushDNS
         self.otherAccountsOp = measureOtherAccounts
     }
 
@@ -108,15 +117,24 @@ public final class HelperService: NSObject, AndromedaHelperXPC, @unchecked Senda
     }
 
     public func rebuildSpotlightIndex(reply: @escaping @Sendable (String?) -> Void) {
+        runMaintenance(spotlightOp, name: "rebuildSpotlightIndex", reply: reply)
+    }
+
+    public func flushDNSCache(reply: @escaping @Sendable (String?) -> Void) {
+        runMaintenance(dnsOp, name: "flushDNSCache", reply: reply)
+    }
+
+    private func runMaintenance(_ operation: @escaping @Sendable () -> HelperErrorCode?, name: String,
+                                reply: @escaping @Sendable (String?) -> Void) {
         let pid = Peer.current().pid
         guard begin() else {
-            log.notice("op=rebuildSpotlightIndex pid=\(pid, privacy: .public) result=busy")
+            log.notice("op=\(name, privacy: .public) pid=\(pid, privacy: .public) result=busy")
             reply(HelperErrorCode.busy.rawValue)
             return
         }
         queue.async { [self] in
-            let code = spotlightOp()
-            log.notice("op=rebuildSpotlightIndex pid=\(pid, privacy: .public) result=\(code?.rawValue ?? "ok", privacy: .public)")
+            let code = operation()
+            log.notice("op=\(name, privacy: .public) pid=\(pid, privacy: .public) result=\(code?.rawValue ?? "ok", privacy: .public)")
             let hook = end()
             reply(code?.rawValue)
             hook?()

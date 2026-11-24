@@ -19,7 +19,7 @@ public enum RestoreError: Error, Equatable {
 ///   its fully resolved path;
 /// - something exists there, and its `lstat` inode equals `trashFileID`.
 ///
-/// Anything else in the Trash, including the user's own files, is never touched.
+/// The batch action only touches files this app put there. Trash Bins has its own explicit review.
 ///
 /// This is the only place in the product that permanently deletes. The check and the deletion are
 /// separate system calls, so a swap in between can't be ruled out entirely; the window is a single
@@ -153,7 +153,8 @@ public struct TrashLedger {
     public static func allowsPermanentDeletion(_ catalogEntryID: String) -> Bool {
         catalogEntryID != DuplicateScanner.cleanupCatalogID && catalogEntryID != ApplicationCleanup.catalogID
             && catalogEntryID != InstallerCleanup.catalogID && catalogEntryID != SimilarImageCleanup.catalogID
-            && catalogEntryID != BrowserFileCleanup.catalogID
+            && catalogEntryID != BrowserFileCleanup.catalogID && catalogEntryID != ToolCleanup.mailAttachments.catalogID
+            && catalogEntryID != ToolCleanup.aiClutter.catalogID
     }
 
     private enum Check {
@@ -273,5 +274,87 @@ public struct TrashLedger {
             batchID: entry.batchID, catalogEntryID: entry.catalogEntryID,
             originalPath: entry.originalPath, trashPath: entry.trashPath, trashFileID: entry.trashFileID,
             bytes: entry.bytes, outcome: outcome, relatesTo: entry.id)
+    }
+}
+
+// A separate explicit Trash Bins review can approve items that were put in Trash outside Andromeda.
+extension TrashLedger {
+    public func emptyReviewedBins(_ items: [TrashBins.Item]) -> TrashBins.Receipt {
+        var receipt = TrashBins.Receipt()
+        let entries: [JournalEntry]
+        do { entries = try journal.load().entries } catch { receipt.journalFailed = true; return receipt }
+        let pending = Self.settledIDs(entries)
+        let recorded = Dictionary(grouping: entries.filter { Self.isTrashMove($0) && !pending.contains($0.id) }) {
+            $0.trashPath
+        }
+        let batch = UUID()
+        for item in items {
+            let path = item.url.path
+            let previous = recorded[path]?.last {
+                $0.trashFileID == UInt64(item.tree.root.identity.ino) && $0.volumeUUID == item.volume?.id
+            }
+            var entry = JournalEntry(batchID: batch, catalogEntryID: "trash-bins", originalPath: path,
+                                     bytes: item.bytes, outcome: .planned, relatesTo: nil, action: .command,
+                                     volumeUUID: item.volume?.id, volumeMount: item.volume?.url.path,
+                                     volumeName: item.volume?.name)
+            do { try journal.append(entry) } catch { receipt.journalFailed = true; break }
+            let result = deleteReviewed(item)
+            switch result {
+            case .done:
+                receipt.deleted += 1
+                entry.outcome = .permanentlyDeleted
+            case .skip:
+                receipt.skipped += 1
+                entry.outcome = .skipped(.changedSinceScan)
+            case .failed:
+                receipt.failed += 1
+                entry.outcome = .failed("Couldn’t remove every reviewed item in this folder.")
+            }
+            do {
+                let prior = entry.outcome == .permanentlyDeleted ? previous.map { followUp($0, .permanentlyDeleted) } : nil
+                try journal.append(contentsOf: [entry] + [prior].compactMap { $0 })
+            } catch { receipt.journalFailed = true; break }
+        }
+        return receipt
+    }
+
+    private enum ReviewedDeletion { case done, skip, failed }
+
+    private func deleteReviewed(_ item: TrashBins.Item) -> ReviewedDeletion {
+        if let volume = item.volume {
+            let root = volume.url.appendingPathComponent(".Trashes/\(getuid())", isDirectory: true)
+            guard item.root == root, volume.kind == .drive, !volume.isReadOnly,
+                  VolumeDiscovery.isStillMounted(volume) else { return .skip }
+        } else {
+            guard item.root == env.trash else { return .skip }
+        }
+        let fd = ReviewedFileTree.openDirectory(item.root)
+        guard fd >= 0 else { return .skip }
+        defer { close(fd) }
+        let name = item.url.lastPathComponent
+        guard item.url.deletingLastPathComponent() == item.root.standardizedFileURL,
+              TrashBins.binIdentity(fd) == item.binIdentity,
+              ReviewedFileTree.capture(parent: fd, name: name) == item.tree else { return .skip }
+        return Self.removeReviewedNode(name, parent: fd, path: "", tree: item.tree) ? .done : .failed
+    }
+
+    private static func removeReviewedNode(_ name: String, parent: Int32, path: String,
+                                           tree: ReviewedFileTree) -> Bool {
+        guard let stamp = tree.nodes[path], ReviewedFileTree.stamp(parent: parent, name: name) == stamp else {
+            return false
+        }
+        if stamp.kind != S_IFDIR { return unlinkat(parent, name, 0) == 0 }
+        let fd = openat(parent, name, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC)
+        guard fd >= 0 else { return false }
+        defer { close(fd) }
+        var info = stat()
+        guard fstat(fd, &info) == 0, ReviewedFileTree.Stamp(info) == stamp,
+              let names = ReviewedFileTree.names(in: fd) else { return false }
+        for child in names {
+            let nested = path.isEmpty ? child : path + "/" + child
+            guard removeReviewedNode(child, parent: fd, path: nested, tree: tree) else { return false }
+        }
+        guard ReviewedFileTree.stamp(parent: parent, name: name)?.identity == stamp.identity else { return false }
+        return unlinkat(parent, name, AT_REMOVEDIR) == 0
     }
 }

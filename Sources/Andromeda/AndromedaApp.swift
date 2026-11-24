@@ -54,9 +54,18 @@ enum AndromedaMain {
 private final class AndromedaLifecycle: NSObject, NSApplicationDelegate, NSMenuDelegate {
     let model = AppModel(deps: .live(), storageNotifications: StorageNotifications())
     let updates = UpdateController()
+    let ui = UIState()
     static let automationMenuKey = "diskplain.folderAutomation.showMenuBarItem"
     private var statusItem: NSStatusItem?
     private var pauseItem: NSMenuItem?
+    private var openSettings: OpenSettingsAction?
+    private var pendingSettings = false
+    private lazy var storageStatus = StorageStatusItem(
+        model: model,
+        openApp: { [weak self] in self?.reopenFromMenu() },
+        openTrends: { [weak self] in self?.reopenMainWindow(showing: .storageTrends) },
+        openTools: { [weak self] in self?.reopenMainWindow(showing: .tools) },
+        openSettings: { [weak self] in self?.openSettingsFromMenu() })
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         updates.start()
@@ -64,6 +73,7 @@ private final class AndromedaLifecycle: NSObject, NSApplicationDelegate, NSMenuD
         model.folderAutomation.start()
         Task { await model.startDriveMonitoring() }
         updateAutomationMenu(shown: UserDefaults.standard.bool(forKey: Self.automationMenuKey))
+        updateStorageMenu(shown: UserDefaults.standard.object(forKey: StorageStatusItem.preference) as? Bool ?? true)
     }
 
     func applicationDidBecomeActive(_ notification: Notification) {
@@ -73,6 +83,16 @@ private final class AndromedaLifecycle: NSObject, NSApplicationDelegate, NSMenuD
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { false }
+
+    func updateStorageMenu(shown: Bool) { storageStatus.setVisible(shown) }
+
+    func registerSettingsAction(_ action: OpenSettingsAction) {
+        openSettings = action
+        if pendingSettings {
+            pendingSettings = false
+            Task { @MainActor in openSettingsFromMenu() }
+        }
+    }
 
     func updateAutomationMenu(shown: Bool) {
         if !shown {
@@ -114,7 +134,22 @@ private final class AndromedaLifecycle: NSObject, NSApplicationDelegate, NSMenuD
     }
 
     @objc private func reopenFromMenu() {
+        reopenMainWindow(showing: nil)
+    }
+
+    private func reopenMainWindow(showing destination: UIState.Destination?) {
+        if let destination { ui.destination = destination }
         NSWorkspace.shared.open(Bundle.main.bundleURL)
+    }
+
+    private func openSettingsFromMenu() {
+        guard let openSettings else {
+            pendingSettings = true
+            reopenFromMenu()
+            return
+        }
+        NSApp.activate()
+        openSettings()
     }
 
     @objc private func toggleAutomationPause() {
@@ -127,8 +162,8 @@ private final class AndromedaLifecycle: NSObject, NSApplicationDelegate, NSMenuD
 
 struct AndromedaApp: App {
     @NSApplicationDelegateAdaptor private var lifecycle: AndromedaLifecycle
-    @State private var ui = UIState()
     @AppStorage(AndromedaLifecycle.automationMenuKey) private var showsAutomationMenu = false
+    @AppStorage(StorageStatusItem.preference) private var showsStorageMenu = true
 
     /// The verify build says so in its title, so screenshots can't be mistaken for the normal app.
     private static let windowTitle: String = {
@@ -142,8 +177,9 @@ struct AndromedaApp: App {
     var body: some Scene {
         let model = lifecycle.model
         let updates = lifecycle.updates
+        let ui = lifecycle.ui
         WindowGroup(Self.windowTitle) {
-            RootView(model: model, ui: ui, showUpdate: updates.updateAvailable ? { updates.showUpdate() } : nil)
+            AndromedaWindowContent(lifecycle: lifecycle)
                 .frame(minWidth: 900, minHeight: 700)
         }
         .defaultSize(width: 1080, height: 780)
@@ -158,6 +194,12 @@ struct AndromedaApp: App {
                     showsAutomationMenu = $0
                     lifecycle.updateAutomationMenu(shown: $0)
                 }
+            ), showsStorageMenu: Binding(
+                get: { showsStorageMenu },
+                set: {
+                    showsStorageMenu = $0
+                    lifecycle.updateStorageMenu(shown: $0)
+                }
             ), showVersionHistory: updates.showVersionHistory, receivesPublicBetas: updates.offersPublicBetas ? Binding(
                 get: { updates.receivesPublicBetas },
                 set: updates.setReceivesPublicBetas
@@ -166,5 +208,17 @@ struct AndromedaApp: App {
         }
         .defaultSize(width: 730, height: 640)
         .windowResizability(.contentMinSize)
+    }
+}
+
+private struct AndromedaWindowContent: View {
+    let lifecycle: AndromedaLifecycle
+    @Environment(\.openSettings) private var openSettings
+
+    var body: some View {
+        let updates = lifecycle.updates
+        RootView(model: lifecycle.model, ui: lifecycle.ui,
+                 showUpdate: updates.updateAvailable ? { updates.showUpdate() } : nil)
+            .onAppear { lifecycle.registerSettingsAction(openSettings) }
     }
 }

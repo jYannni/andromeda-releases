@@ -29,13 +29,16 @@ struct ItemRowView: View {
     let model: AppModel
     let ui: UIState
     let row: ItemRow
-    /// "Probably counted as <bucket>", shown on Overview quick wins.
+    /// "Probably counted as <bucket>", shown on Overview cleanup suggestions.
     var bucketTag: String?
+    var showsVerdictBadge = true
+    var showsSelection = true
     @State private var showsOllamaModels = false
 
     var body: some View {
+        let simulators = SimulatorInventory.Group(rawValue: row.id)
         HStack(alignment: .top, spacing: 12) {
-            if row.selectable {
+            if row.selectable && showsSelection {
                 Toggle(row.title, isOn: Binding(
                     get: { model.removal.selected.contains(row.id) },
                     set: { _ in model.removal.toggle(row.id) }))
@@ -46,24 +49,30 @@ struct ItemRowView: View {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(alignment: .firstTextBaseline, spacing: 8) {
                     Text(row.title).font(.body.weight(.semibold))
-                    VerdictBadge(label: row.verdictLabel, kind: row.verdictKind)
+                    if showsVerdictBadge && simulators == nil {
+                        VerdictBadge(label: row.verdictLabel, kind: row.verdictKind)
+                    }
                     if let bucketTag { Text(bucketTag).font(.caption).foregroundStyle(.tertiary) }
+                    if let details = removalDetails {
+                        RemovalDetailsButton(title: row.title, afterwards: details.afterwards, howRemoved: details.howRemoved)
+                    }
                 }
                 Text(row.detail).font(.callout).foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
-                if row.verdictKind != .reportOnly {
-                    VStack(alignment: .leading, spacing: 3) {
-                        fact(UICopy.afterwardsLabel, row.afterwards, symbol: "arrow.turn.down.right")
-                        fact(UICopy.howRemovedLabel, row.howRemoved, symbol: "hand.raised")
-                    }
+                if let simulators {
+                    SimulatorInventoryView(model: model, ui: ui, group: simulators)
+                } else {
+                    if let text = row.notVerifiedNote { note(text) }
+                    if let text = row.toolMissingNote { note(text) }
+                    actions
                 }
-                if let text = row.notVerifiedNote { note(text) }
-                if let text = row.toolMissingNote { note(text) }
-                actions
             }
             Spacer(minLength: 12)
             VStack(alignment: .trailing, spacing: 3) {
                 Text(row.sizeText).font(.title3.weight(.semibold)).monospacedDigit()
+                if simulators == .runtimes || simulators == .systemRuntimes {
+                    Text("On-disk scan").font(.caption).foregroundStyle(.secondary)
+                }
                 if let frees = row.freesText { Text(frees).font(.caption).foregroundStyle(.secondary) }
                 if let note = row.commandSizeNote { Text(note).font(.caption).foregroundStyle(.secondary) }
                 if let shared = row.sharedNote { Text(shared).font(.caption).foregroundStyle(.secondary) }
@@ -77,13 +86,18 @@ struct ItemRowView: View {
         }
     }
 
-    private func fact(_ label: String, _ value: String, symbol: String) -> some View {
-        Label {
-            (Text(label + "  ").foregroundStyle(.secondary) + Text(value)).font(.callout)
-        } icon: {
-            Image(systemName: symbol).font(.caption).foregroundStyle(.tertiary)
+    private var removalDetails: (afterwards: String, howRemoved: String)? {
+        switch SimulatorInventory.Group(rawValue: row.id) {
+        case .devices:
+            return ("The selected simulators and their installed apps and data are deleted.",
+                    "Andromeda asks Xcode to delete each selected device.")
+        case .runtimes, .systemRuntimes:
+            return ("Simulators that depend on a removed runtime become unavailable.",
+                    "Andromeda asks Xcode to remove the selected registered runtimes.")
+        case nil:
+            guard row.verdictKind != .reportOnly else { return nil }
+            return (row.afterwards, row.howRemoved)
         }
-        .fixedSize(horizontal: false, vertical: true)
     }
 
     private func note(_ text: String) -> some View {
@@ -112,6 +126,43 @@ struct ItemRowView: View {
                 .disabled(!model.removal.canEditSelection)
         case .restart, .none:
             EmptyView()
+        }
+    }
+}
+
+
+private struct RemovalDetailsButton: View {
+    let title: String
+    let afterwards: String
+    let howRemoved: String
+
+    @State private var showingDetails = false
+
+    var body: some View {
+        Button { showingDetails.toggle() } label: {
+            Image(systemName: "info.circle")
+                .foregroundStyle(.secondary)
+                .padding(2)
+                .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Removal details for \(title)")
+        .help("\(UICopy.afterwardsLabel)\n\(afterwards)\n\n\(UICopy.howRemovedLabel)\n\(howRemoved)")
+        .popover(isPresented: $showingDetails) {
+            VStack(alignment: .leading, spacing: 10) {
+                detail(UICopy.afterwardsLabel, value: afterwards)
+                detail(UICopy.howRemovedLabel, value: howRemoved)
+            }
+            .padding(14)
+            .frame(width: 300, alignment: .leading)
+        }
+    }
+
+    private func detail(_ label: String, value: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(label).font(.callout.weight(.semibold))
+            Text(value).font(.callout).foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

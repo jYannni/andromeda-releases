@@ -31,6 +31,8 @@ public struct AppCommands: Commands {
                 .keyboardShortcut("4", modifiers: .command)
             Button(Copy.Organize.organizeFolderTitle) { ui.destination = .organizeFolder }
                 .keyboardShortcut("5", modifiers: .command)
+            Button("Tools") { ui.destination = .tools }
+                .keyboardShortcut("6", modifiers: .command)
             Divider()
             Button("Search Drive Catalogs") { ui.focusCatalogSearch() }
                 .keyboardShortcut("f", modifiers: [.command, .shift])

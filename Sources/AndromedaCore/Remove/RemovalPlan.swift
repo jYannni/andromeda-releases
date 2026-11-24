@@ -3,6 +3,7 @@ import Foundation
 public enum RemovalAction: Equatable, Sendable {
     case moveToTrash(URL)
     case runTool(executable: URL, arguments: [String])
+    case removeOllamaModel(OllamaLocalModels.Model)
     /// Carried out by the privileged helper. Never reversible.
     case privileged(PrivilegedOperation)
 }
@@ -36,10 +37,12 @@ public struct PlannedRemoval: Identifiable, Equatable, Sendable {
     let applicationCheck: ApplicationCleanup.TrashCheck?
     let browserFileCheck: BrowserFileCleanup.TrashCheck?
     let similarImageCheck: SimilarImageCleanup.TrashCheck?
+    let toolCleanupCheck: ToolCleanup.Check?
     public var retainedDuplicate: URL? { duplicateCheck?.keeperURL }
     public var allowsPermanentDeletion: Bool { TrashLedger.allowsPermanentDeletion(catalogEntryID) }
     public var isBrowserFileCleanup: Bool { browserFileCheck != nil }
     public var retainedSimilarImage: URL? { similarImageCheck?.keeper.url }
+    public var isToolCleanup: Bool { toolCleanupCheck != nil }
 
     public var reversible: Bool {
         if case .moveToTrash = action { true } else { false }
@@ -51,7 +54,7 @@ public struct PlannedRemoval: Identifiable, Equatable, Sendable {
         privateBytes: Int64? = nil, clonesPresent: Bool = false,
         expectation: ItemExpectation?, appsMustBeQuit: [String], duplicateCheck: DuplicateScanner.TrashCheck? = nil,
         applicationCheck: ApplicationCleanup.TrashCheck? = nil, browserFileCheck: BrowserFileCleanup.TrashCheck? = nil,
-        similarImageCheck: SimilarImageCleanup.TrashCheck? = nil
+        similarImageCheck: SimilarImageCleanup.TrashCheck? = nil, toolCleanupCheck: ToolCleanup.Check? = nil
     ) {
         self.id = id
         self.catalogEntryID = catalogEntryID
@@ -65,6 +68,7 @@ public struct PlannedRemoval: Identifiable, Equatable, Sendable {
         self.applicationCheck = applicationCheck
         self.browserFileCheck = browserFileCheck
         self.similarImageCheck = similarImageCheck
+        self.toolCleanupCheck = toolCleanupCheck
     }
 }
 
@@ -95,6 +99,13 @@ public struct RemovalPlan: Equatable, Sendable {
             return "Move \(ByteFormat.string(total)) to Trash"
         }
         return "Remove \(ByteFormat.string(total))"
+    }
+}
+
+extension PlanBuilder {
+    public static func reviewedSnapshotPlan(_ removals: [PlannedRemoval]) -> RemovalPlan? {
+        guard !removals.isEmpty, removals.allSatisfy({ $0.catalogEntryID == "time-machine-local-snapshots" }) else { return nil }
+        return RemovalPlan(removals: removals)
     }
 }
 

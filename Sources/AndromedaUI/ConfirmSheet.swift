@@ -11,8 +11,12 @@ struct ConfirmSheet: View {
     static let listCap: CGFloat = 360
 
     var body: some View {
+        let movesFiles = summary.rows.contains(where: \.reversible)
+        let maintenance = summary.plan.removals.contains { $0.catalogEntryID.hasPrefix("maintenance-") }
         VStack(alignment: .leading, spacing: 16) {
-            SheetHeader(title: UICopy.confirmHeading, subtitle: UICopy.confirmSubtitle, symbol: "trash.fill", tint: .red)
+            SheetHeader(title: movesFiles ? UICopy.confirmHeading : summary.confirmTitle,
+                        subtitle: movesFiles ? UICopy.confirmSubtitle : nil,
+                        symbol: maintenance ? "wrench.and.screwdriver" : "trash.fill", tint: maintenance ? .teal : .red)
             ScrollView { InsetGroup {
                 ForEach(Array(summary.rows.enumerated()), id: \.offset) { _, row in
                     HStack(alignment: .top, spacing: 12) {

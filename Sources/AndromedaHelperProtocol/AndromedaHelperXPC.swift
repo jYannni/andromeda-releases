@@ -16,4 +16,7 @@ import Foundation
 
     /// `nil` means success; otherwise a `HelperErrorCode` raw value.
     func rebuildSpotlightIndex(reply: @escaping @Sendable (String?) -> Void)
+
+    /// Clears the system DNS caches without accepting paths, arguments or process names from the client.
+    func flushDNSCache(reply: @escaping @Sendable (String?) -> Void)
 }

@@ -250,9 +250,16 @@ public final class StorageMonitor {
         return true
     }
 
-    public func trend(including scans: [StorageReading], since: Date) -> [StorageReading] {
+    public func trend(including scans: [StorageReading], since: Date,
+                      startup: ConnectedStorage.StartupDisk? = nil) -> [StorageReading] {
         var byDate: [Date: StorageReading] = [:]
-        for reading in scans + readings where reading.date >= since { byDate[reading.date] = reading }
+        for reading in scans + readings where reading.date >= since {
+            if let startup {
+                guard let volumeID = startup.volumeID, reading.volume == volumeID,
+                      reading.capacity == startup.capacity else { continue }
+            }
+            byDate[reading.date] = reading
+        }
         guard let latest = byDate.values.max(by: { $0.date < $1.date }) else { return [] }
         return byDate.values.filter { $0.volume == latest.volume && $0.capacity == latest.capacity }
             .sorted { $0.date < $1.date }

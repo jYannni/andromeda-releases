@@ -5,10 +5,15 @@ import Foundation
 public enum FixedCommand: Equatable, CaseIterable, Sendable {
     case rebuildSpotlight
     case spotlightStatus
+    case flushDNSDirectoryCache
+    case flushMulticastDNSCache
+    case flushLegacyMulticastDNSCache
 
     public var executable: String {
         switch self {
         case .rebuildSpotlight, .spotlightStatus: return "/usr/bin/mdutil"
+        case .flushDNSDirectoryCache: return "/usr/bin/dscacheutil"
+        case .flushMulticastDNSCache, .flushLegacyMulticastDNSCache: return "/bin/launchctl"
         }
     }
 
@@ -17,6 +22,9 @@ public enum FixedCommand: Equatable, CaseIterable, Sendable {
         // `/` is the sealed System volume, whose index is small; the index that grows lives on the Data volume.
         case .rebuildSpotlight: return ["-E", "/System/Volumes/Data"]
         case .spotlightStatus: return ["-s", "/System/Volumes/Data"]
+        case .flushDNSDirectoryCache: return ["-flushcache"]
+        case .flushMulticastDNSCache: return ["kill", "SIGHUP", "system/com.apple.mDNSResponder.reloaded"]
+        case .flushLegacyMulticastDNSCache: return ["kill", "SIGHUP", "system/com.apple.mDNSResponder"]
         }
     }
 }

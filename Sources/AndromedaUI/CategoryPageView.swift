@@ -22,6 +22,9 @@ struct CategoryPageView: View {
                 symbol: Style.symbol(page.id), tint: Style.bucketColor(page.id)
             ) {
                 Button("Browse Files", systemImage: "folder") { ui.destination = .browseCategory(page.id) }
+                if page.id == .mail {
+                    Button("Mail Attachments…") { ui.destination = .tool(.mailAttachments) }
+                }
                 if page.id == .applications {
                     Menu("App Cleanup", systemImage: "app.badge") {
                         Button("Manage Installed Apps…") { appReview = .installed }

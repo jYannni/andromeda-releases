@@ -16,15 +16,17 @@ public struct XPCPrivilegedRunner: PrivilegedRunner {
     }
 
     public func run(_ op: PrivilegedOperation) -> Outcome {
-        switch op {
-        case .rebuildSpotlightIndex:
-            // `version` and the operation travel on one connection, so the build check vouches
-            // for the very helper process that runs the operation.
-            switch wait({ helper, reply in helper.rebuildSpotlightIndex(reply: reply) }) {
-            case .success(nil): return .done
-            case .success(let code?): return Self.outcome(HelperClient.rejection(code))
-            case .failure(let error): return Self.outcome(error)
+        // The version check and the operation travel on the same connection.
+        let result: Result<String?, HelperClientError> = wait { helper, reply in
+            switch op {
+            case .rebuildSpotlightIndex: helper.rebuildSpotlightIndex(reply: reply)
+            case .flushDNSCache: helper.flushDNSCache(reply: reply)
             }
+        }
+        switch result {
+        case .success(nil): return .done
+        case .success(let code?): return Self.outcome(HelperClient.rejection(code))
+        case .failure(let error): return Self.outcome(error)
         }
     }
 

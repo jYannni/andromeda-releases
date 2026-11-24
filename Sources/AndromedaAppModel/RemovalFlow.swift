@@ -34,6 +34,7 @@ public struct ConfirmSummary: Equatable, Sendable {
     /// Always true: the sheet's default button is Cancel.
     public let cancelIsDefault: Bool
     var appCleanupKeys: Set<IgnoredAppCleanupItem.Key> = []
+    var usesStandaloneReview = false
 }
 
 public struct IgnoredAppCleanupItem: Codable, Equatable, Identifiable, Sendable {
@@ -517,6 +518,131 @@ public final class RemovalFlow {
         return summary(plan, findings: [finding], stamp: result.finishedAt)
     }
 
+    public func loadSimulators(_ group: SimulatorInventory.Group) async -> SimulatorInventory {
+        let deps = self.deps
+        return await BackgroundWork.runNonThrowing("andromeda.simulators") {
+            SimulatorInventory.read(using: deps.tools, group: group, env: deps.env)
+        }
+    }
+
+    public func prepareSimulatorConfirm(
+        _ inventory: SimulatorInventory, group: SimulatorInventory.Group, selected: Set<String>
+    ) -> ConfirmSummary? {
+        guard removalDisabledReason == nil, !isExecuting,
+              let plan = inventory.removalPlan(for: group, selected: selected) else { return nil }
+        let rows = inventory[group].filter { selected.contains($0.id) }.map { entry in
+            ConfirmRow(title: entry.name, sizeText: Copy.Confirm.commandSizeNotShown,
+                       howRemoved: group == .devices ? "Xcode deletes this simulator and its app data"
+                           : "Xcode removes this OS runtime. Simulators that depend on it become unavailable.",
+                       reversible: false, location: entry.detail)
+        }
+        let title = group == .devices ? "Delete Selected Simulators" : "Remove Selected Runtimes"
+        return ConfirmSummary(plan: plan, rows: rows, confirmTitle: title,
+                              irreversibleNote: Copy.Confirm.irreversibleNote, quitFirst: [], quitFirstLine: nil,
+                              scanStamp: .distantPast, cancelIsDefault: true, usesStandaloneReview: true)
+    }
+
+    public func scanTool(_ tool: ToolCleanup, control: ScanControl) async -> ToolCleanup.Review {
+        let deps = deps
+        return await BackgroundWork.runNonThrowing("andromeda.tools.cleanup") {
+            tool.scan(env: deps.env, protectedReadable: deps.fda() == .granted, control: control)
+        }
+    }
+
+    public func prepareToolCleanup(_ items: [ToolCleanup.Item], selected: Set<URL>) -> ConfirmSummary? {
+        guard removalDisabledReason == nil, !isExecuting,
+              let plan = ToolCleanup.plan(items, selected: selected) else { return nil }
+        let locations = Dictionary(items.map { ($0.url, $0.title) }, uniquingKeysWith: { first, _ in first })
+        let rows = plan.removals.compactMap { removal -> ConfirmRow? in
+            guard case .moveToTrash(let url) = removal.action,
+                  let title = locations[url], let bytes = removal.expectedBytes else { return nil }
+            return ConfirmRow(title: title, sizeText: ByteFormat.string(bytes), howRemoved: Copy.HowRemoved.trash,
+                              reversible: true, location: Copy.Scan.displayPath(url, home: deps.env.home))
+        }
+        let running = Set(plan.removals.flatMap(\.appsMustBeQuit)).sorted()
+            .filter { deps.apps.isRunning(bundleID: $0) }.map { deps.appName($0) ?? $0 }
+        return ConfirmSummary(plan: plan, rows: rows, confirmTitle: "Move Selected Items to Trash",
+                              irreversibleNote: nil, quitFirst: running,
+                              quitFirstLine: running.isEmpty ? nil : Copy.Confirm.quitFirst(names: running, items: rows.count),
+                              scanStamp: .distantPast, cancelIsDefault: true, usesStandaloneReview: true)
+    }
+
+    public func scanLocalSnapshots(control: ScanControl) async -> Finding? {
+        let deps = deps
+        return await BackgroundWork.runNonThrowing("andromeda.tools.snapshots") {
+            guard let catalog = try? deps.catalog() else { return nil }
+            return CatalogScanner(env: deps.env, snapshots: deps.snapshots, promptingPathsReadable: false)
+                .scan(catalog.filter { $0.id == "time-machine-local-snapshots" }, control: control).first
+        }
+    }
+
+    public func prepareLocalSnapshots(_ finding: Finding, selected: Set<String>) -> ConfirmSummary? {
+        guard removalDisabledReason == nil, !isExecuting, finding.id == "time-machine-local-snapshots",
+              let reviewed = try? PlanBuilder.build([finding]) else { return nil }
+        let rows = reviewed.removals.filter { removal in
+            guard case .runTool(_, let arguments) = removal.action, let date = arguments.last else { return false }
+            return selected.contains(date)
+        }
+        guard !rows.isEmpty else { return nil }
+        return localSnapshotSummary(rows)
+    }
+
+    private func localSnapshotSummary(_ removals: [PlannedRemoval]) -> ConfirmSummary? {
+        guard let plan = PlanBuilder.reviewedSnapshotPlan(removals) else { return nil }
+        let rows = removals.compactMap { removal -> ConfirmRow? in
+            guard case .runTool(_, let arguments) = removal.action, let date = arguments.last else { return nil }
+            return ConfirmRow(title: date, sizeText: Copy.Confirm.commandSizeNotShown,
+                              howRemoved: "Delete this local Time Machine restore point", reversible: false)
+        }
+        return ConfirmSummary(plan: plan, rows: rows, confirmTitle: "Delete Selected Local Snapshots",
+                              irreversibleNote: "Selected local restore points will be permanently deleted. Backups on your Time Machine drive are kept.",
+                              quitFirst: [], quitFirstLine: nil, scanStamp: .distantPast, cancelIsDefault: true,
+                              usesStandaloneReview: true)
+    }
+
+    public func prepareMaintenance(_ task: MaintenanceTask) -> ConfirmSummary? {
+        guard removalDisabledReason == nil, !isExecuting,
+              let plan = task.plan(osMajor: deps.env.osMajor, helperReady: helper?.isReady == true) else { return nil }
+        return ConfirmSummary(plan: plan, rows: [ConfirmRow(title: task.title, sizeText: Copy.Confirm.commandSizeNotShown,
+                                                           howRemoved: task.detail, reversible: false)],
+                              confirmTitle: task.title, irreversibleNote: nil, quitFirst: [], quitFirstLine: nil,
+                              scanStamp: .distantPast, cancelIsDefault: true, usesStandaloneReview: true)
+    }
+
+    public func listOllamaModels() async -> [OllamaLocalModels.Model]? {
+        let tools = deps.tools
+        return await BackgroundWork.runNonThrowing("andromeda.tools.ollama-tags") { OllamaLocalModels.list(using: tools) }
+    }
+
+    public func prepareOllamaRemoval(_ model: OllamaLocalModels.Model) -> ConfirmSummary? {
+        guard removalDisabledReason == nil, !isExecuting, let plan = OllamaLocalModels.plan(model) else { return nil }
+        let row = ConfirmRow(title: model.name, sizeText: ByteFormat.string(model.size),
+                             howRemoved: "Ask the local Ollama service to remove this model.", reversible: false)
+        return ConfirmSummary(plan: plan, rows: [row], confirmTitle: "Remove Model",
+                              irreversibleNote: "You’ll need to download or recreate the model to use it again.",
+                              quitFirst: [], quitFirstLine: nil, scanStamp: .distantPast, cancelIsDefault: true,
+                              usesStandaloneReview: true)
+    }
+
+    public func scanTrashBins(control: ScanControl) async -> [TrashBins.Bin]? {
+        let deps = deps
+        return await BackgroundWork.runNonThrowing("andromeda.tools.trash-bins") {
+            guard deps.fda() == .granted else { return nil }
+            return TrashBins.scan(env: deps.env, volumes: deps.volumes(), control: control)
+        }
+    }
+
+    public func emptyTrashBins(_ items: [TrashBins.Item]) async -> TrashBins.Receipt? {
+        guard !items.isEmpty, let journal, removalDisabledReason == nil, !isExecuting else { return nil }
+        if case .scanning = scan.state { return nil }
+        isExecuting = true
+        defer { isExecuting = false }
+        let deps = deps
+        return await BackgroundWork.runNonThrowing("andromeda.tools.empty-trash") {
+            TrashLedger(env: deps.env, journal: journal, volumes: deps.volumes).emptyReviewedBins(items)
+        }
+    }
+
     private func summary(_ plan: RemovalPlan, findings: [Finding], stamp: Date) -> ConfirmSummary {
         let byID = Dictionary(findings.map { ($0.id, $0) }, uniquingKeysWith: { a, _ in a })
         let perEntry = Dictionary(grouping: plan.removals, by: \.catalogEntryID).mapValues(\.count)
@@ -537,6 +663,9 @@ public final class RemovalFlow {
                 location = nil
             case .privileged:
                 how = Copy.HowRemoved.helperRebuildsSpotlight
+                location = nil
+            case .removeOllamaModel(let model):
+                how = "Ollama removes \(model.name)"
                 location = nil
             }
             var sizeText = r.expectedBytes.map { ByteFormat.string($0) } ?? Copy.Rows.sizeNotMeasured
@@ -615,10 +744,10 @@ public final class RemovalFlow {
         guard removalDisabledReason == nil, let journal else { return refuse(Self.disabledReason) }
         if case .scanning = scan.state { return refuse(Copy.Receipt.refusedScanning) }
         // A summary belongs to the scan it was built from and runs once.
-        let browserCleanup = s.plan.removals.first.map {
-            $0.retainedDuplicate != nil || $0.isBrowserFileCleanup || $0.retainedSimilarImage != nil
+        let standalone = s.usesStandaloneReview || s.plan.removals.first.map {
+            $0.retainedDuplicate != nil || $0.isBrowserFileCleanup || $0.retainedSimilarImage != nil || $0.isToolCleanup
         } ?? false
-        guard (browserCleanup || current?.finishedAt == s.scanStamp),
+        guard (standalone || current?.finishedAt == s.scanStamp),
               !executedBatches.contains(s.plan.batchID) else { return refuse(Copy.Receipt.refusedStale) }
         guard s.appCleanupKeys.isDisjoint(with: ignoredAppCleanupItems.map(\.id)) else {
             return refuse("This review includes an item now ignored by App Cleanup. Review the files again.")
@@ -667,7 +796,7 @@ public final class RemovalFlow {
         makeReceipt(s, run)
         progress = nil
         isExecuting = false
-        if !browserCleanup {
+        if !standalone {
             selected = []
             // The helper work is over; a new scan must not find a connection from this run.
             helper?.disconnect()

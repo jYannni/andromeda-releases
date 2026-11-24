@@ -53,6 +53,7 @@ struct SidebarView: View {
         return [
             (nil, [
                 Item(.overview, UICopy.overview, "chart.pie", color: .orange),
+                Item(.tools, "Tools", "wrench.and.screwdriver", color: .teal),
                 Item(.scanComparison, "What changed?", "arrow.up.arrow.down", color: .purple),
                 Item(.storageTrends, "Storage Trends", "chart.xyaxis.line", color: .green),
                 Item(.history, UICopy.history, "clock.arrow.circlepath", color: .indigo),
@@ -80,6 +81,7 @@ struct SidebarView: View {
     }
 
     private var selection: UIState.Destination {
+        if case .tool = ui.destination { return .tools }
         if case .browseCategory(let bucket) = ui.destination { return .page(bucket) }
         if case .reviewFolder = ui.destination { return .spacePlan }
         if case .reviewInstallers = ui.destination { return .page(.applications) }

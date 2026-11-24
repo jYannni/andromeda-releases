@@ -1,7 +1,7 @@
 {
   "id": "orphaned-simulator-runtimes",
   "title": "Simulator runtimes in system assets",
-  "explanation": "macOS stores simulator runtimes in this protected folder, and some may be orphans that Xcode no longer lists and can't remove. Apple's only supported fix for orphans is a clean reinstall.",
+  "explanation": "This protected folder can contain registered Xcode runtimes and orphaned assets. Xcode can remove registered runtimes it marks as removable.",
   "consequence": "Runtimes Xcode still uses stay as they are, and orphans stay until a newer Xcode or runtime install cleans them up, or until a clean reinstall.",
   "paths": [
     "/System/Library/AssetsV2/com_apple_MobileAsset_iOSSimulatorRuntime"

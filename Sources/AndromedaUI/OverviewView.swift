@@ -25,9 +25,7 @@ struct OverviewView: View {
             .buttonStyle(.borderedProminent)
         }
         hero(o)
-        if !o.quickWins.isEmpty {
-            cleanupSuggestions(o.quickWins)
-        }
+        cleanupSuggestions(o.cleanupSuggestions)
         if let text = o.unaccountedText {
             if let breakdown = o.spaceBreakdown {
                 SpaceBreakdownView(model: model, title: text, breakdown: breakdown)
@@ -39,7 +37,7 @@ struct OverviewView: View {
             }
         }
         if let text = o.onlineOnlyText {
-            // Its own row, not a quick win (ruling P8): it opens the Cloud view, where the hand-off is.
+            // Opens the Cloud view, where the hand-off is (ruling P8).
             Button { ui.destination = .cloud } label: {
                 HStack(spacing: 12) {
                     SymbolTile(symbol: "icloud.and.arrow.down", tint: .blue, size: 30)
@@ -52,10 +50,16 @@ struct OverviewView: View {
             .card(padding: 12)
         }
         if !o.cards.isEmpty {
-            SectionHeading(title: UICopy.cardsHeading)
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 14, alignment: .top)], alignment: .leading, spacing: 14) {
-                ForEach(o.cards) { ExplainerCardView(card: $0) }
+            DisclosureGroup {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 300), spacing: 14, alignment: .top)],
+                          alignment: .leading, spacing: 14) {
+                    ForEach(o.cards) { ExplainerCardView(card: $0) }
+                }
+                .padding(.top, 12)
+            } label: {
+                Text(UICopy.cardsHeading).font(.headline).accessibilityAddTraits(.isHeader)
             }
+            .card()
         }
         if !o.couldntCheck.isEmpty {
             SectionHeading(title: Copy.Overview.couldntCheckHeading)
@@ -65,38 +69,101 @@ struct OverviewView: View {
         }
     }
 
-    private func cleanupSuggestions(_ rows: [ItemRow]) -> some View {
-        let selection = model.removal.selected
-        let visibleSelection = selection.intersection(rows.map(\.id))
-        let selectedElsewhere = selection.count - visibleSelection.count
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .bottom) {
-                SectionHeading(title: UICopy.quickWinsTitle, subtitle: UICopy.quickWinsSubtitle)
-                Spacer()
-                Button(visibleSelection.isEmpty ? "Review Selected" : Copy.Confirm.review(visibleSelection.count)) {
-                    reviewCleanupSuggestions(rows)
+    @ViewBuilder private func cleanupSuggestions(_ suggestions: CleanupSuggestions) -> some View {
+        if !suggestions.safe.isEmpty || !suggestions.withCare.isEmpty {
+            let selectableRows = suggestions.selectableRows
+            let selection = model.removal.selected
+            let selectedSuggestions = selection.intersection(selectableRows.map(\.id))
+            let selectedElsewhere = selection.count - selectedSuggestions.count
+            VStack(alignment: .leading, spacing: 12) {
+                HStack(alignment: .bottom) {
+                    SectionHeading(title: UICopy.cleanupSuggestionsTitle, subtitle: UICopy.cleanupSuggestionsSubtitle)
+                    Spacer()
+                    if !selectableRows.isEmpty {
+                        Button(selectedSuggestions.isEmpty ? "Review Selected" : Copy.Confirm.review(selectedSuggestions.count)) {
+                            reviewCleanupSuggestions(suggestions)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .disabled(selectedSuggestions.isEmpty || !model.removal.canEditSelection || model.removal.removalDisabledReason != nil)
+                    }
                 }
-                .buttonStyle(.borderedProminent)
-                .disabled(visibleSelection.isEmpty || !model.removal.canEditSelection || model.removal.removalDisabledReason != nil)
-            }
-            InsetGroup {
-                ForEach(rows) { ItemRowView(model: model, ui: ui, row: $0, bucketTag: bucketTag(for: $0)) }
-            }
-            if selectedElsewhere > 0, model.removal.removalDisabledReason == nil {
-                HStack {
-                    Text(selectedElsewhere == 1 ? "1 more item selected in storage categories."
-                         : "\(selectedElsewhere) more items selected in storage categories.")
-                        .font(.callout).foregroundStyle(.secondary)
-                    Button("Review All Selected…") { ui.requestReview() }
-                        .buttonStyle(.link)
-                        .disabled(!model.removal.canEditSelection)
+                cleanupGroup(suggestions.safe, title: Copy.Verdicts.safe, symbol: "checkmark.shield", tint: .green)
+                cleanupGroup(suggestions.withCare, title: UICopy.cleanupReviewFirst, symbol: "exclamationmark.triangle", tint: .orange)
+                if selectedElsewhere > 0, model.removal.removalDisabledReason == nil {
+                    HStack {
+                        Text(selectedElsewhere == 1 ? "1 more item selected in storage categories."
+                             : "\(selectedElsewhere) more items selected in storage categories.")
+                            .font(.callout).foregroundStyle(.secondary)
+                        Button("Review All Selected…") { ui.requestReview() }
+                            .buttonStyle(.link)
+                            .disabled(!model.removal.canEditSelection)
+                    }
                 }
             }
         }
     }
 
-    func reviewCleanupSuggestions(_ rows: [ItemRow]) {
-        let ids = model.removal.selected.intersection(rows.map(\.id))
+    @ViewBuilder private func cleanupGroup(_ sectors: [CleanupSector], title: String, symbol: String, tint: Color) -> some View {
+        if !sectors.isEmpty {
+            VStack(alignment: .leading, spacing: 8) {
+                Label {
+                    Text(title)
+                } icon: {
+                    Image(systemName: symbol).foregroundStyle(tint).accessibilityHidden(true)
+                }
+                .font(.headline)
+                .accessibilityAddTraits(.isHeader)
+                InsetGroup {
+                    ForEach(sectors) { cleanupSector($0) }
+                }
+            }
+        }
+    }
+
+    private func cleanupSector(_ sector: CleanupSector) -> some View {
+        let selected = sector.id.offersTrash ? sector.rows.count { model.removal.selected.contains($0.id) } : 0
+        return DisclosureGroup {
+            if sector.id == .downloads {
+                HStack(spacing: 12) {
+                    Text(UICopy.cleanupDownloadsDetail).foregroundStyle(.secondary)
+                    Spacer()
+                    Button(UICopy.showInFinder) {
+                        model.reveal(model.scanHome.appendingPathComponent("Downloads", isDirectory: true))
+                    }
+                }
+                .font(.callout)
+                .padding(.vertical, 8)
+            } else {
+                VStack(alignment: .leading, spacing: 0) {
+                    ForEach(sector.rows) { row in
+                        ItemRowView(model: model, ui: ui, row: row, bucketTag: bucketTag(for: row),
+                                    showsVerdictBadge: false, showsSelection: sector.id.offersTrash)
+                    }
+                    if sector.id == .iosSimulators {
+                        Button(UICopy.cleanupOpenDeveloper) { ui.destination = .page(.developer) }
+                            .buttonStyle(.link)
+                            .padding(.leading, 16)
+                    }
+                }
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: Style.cleanupSectorSymbol(sector.id))
+                    .foregroundStyle(.secondary).frame(width: 16).accessibilityHidden(true)
+                Text(Copy.Overview.cleanupSectorTitle(sector.id)).fontWeight(.semibold)
+                Spacer(minLength: 12)
+                if selected > 0 {
+                    Text(UICopy.cleanupSelected(selected)).font(.caption).foregroundStyle(.secondary)
+                }
+                Text(sector.sizeText).monospacedDigit()
+            }
+            .accessibilityElement(children: .combine)
+        }
+        .groupRow()
+    }
+
+    func reviewCleanupSuggestions(_ suggestions: CleanupSuggestions) {
+        let ids = model.removal.selected.intersection(suggestions.selectableRows.map(\.id))
         if let summary = model.removal.prepareConfirm(ids: ids) {
             ui.confirm = summary
         } else {

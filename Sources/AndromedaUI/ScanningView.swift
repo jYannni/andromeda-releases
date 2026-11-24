@@ -13,7 +13,10 @@ struct ScanningView: View {
     var isCancelling = false
     var home: URL = FileManager.default.homeDirectoryForCurrentUser
     var onCancel: (() -> Void)?
+    var revealsContent = true
+    var onChecklistFrame: ((CGRect) -> Void)?
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @AppStorage("scanDetailsExpanded") private var detailsExpanded = false
 
     var body: some View {
@@ -23,11 +26,21 @@ struct ScanningView: View {
                 Text(UICopy.scanningTitle).font(.title2.weight(.bold))
                 Text(UICopy.scanningNote).font(.callout).foregroundStyle(.secondary)
             }
-            VStack(alignment: .leading, spacing: 12) {
-                ForEach(stages, id: \.self) { s in stageRow(s) }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .card(padding: 20)
+            .opacity(revealsContent ? 1 : 0)
+            .animation(reduceMotion ? nil : .easeOut(duration: 0.24).delay(0.10), value: revealsContent)
+
+            scanProgress
+                .opacity(revealsContent ? 1 : 0)
+                .animation(reduceMotion ? nil : .easeOut(duration: 0.22).delay(0.30), value: revealsContent)
+        }
+        .frame(maxWidth: 480)
+        .padding(24)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var scanProgress: some View {
+        VStack(spacing: 20) {
+            checklist
             if let current = currentText {
                 DisclosureGroup(UICopy.scanDetails, isExpanded: $detailsExpanded) {
                     Text(current)
@@ -52,10 +65,16 @@ struct ScanningView: View {
                     .keyboardShortcut(.cancelAction)
             }
         }
-        .frame(maxWidth: 480)
-        .padding(24)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Palette.canvas)
+    }
+
+    private var checklist: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            ForEach(stages, id: \.self) { s in stageRow(s) }
+        }
+        .card(padding: 20)
+        .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(ScanExpansionSpace.detail)) } action: {
+            onChecklistFrame?($0)
+        }
     }
 
     @ViewBuilder private func stageRow(_ s: ScanStage) -> some View {
@@ -100,26 +119,22 @@ struct ScanningView: View {
 }
 
 /// Before the first scan, or after a failed one: a message and one button.
-struct ScanPromptView: View {
+struct ScanPromptView<ButtonContent: View>: View {
     let title: String
     let message: String
-    let button: String
     let disabled: Bool
-    let action: () -> Void
+    @ViewBuilder var button: ButtonContent
 
     var body: some View {
         VStack(spacing: 14) {
             AppIconView(size: 88)
             Text(title).font(.title2.weight(.bold))
             Text(message).foregroundStyle(.secondary).multilineTextAlignment(.center)
-            Button(action: action) { Text(button).frame(minWidth: 140) }
-                .buttonStyle(.borderedProminent).controlSize(.large)
-                .keyboardShortcut(.defaultAction)
+            button
                 .disabled(disabled)
                 .padding(.top, 4)
         }
         .frame(maxWidth: 420)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Palette.canvas)
     }
 }

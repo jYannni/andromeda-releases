@@ -281,8 +281,11 @@ public final class HistoryModel {
                 guard let path = e.originalPath else { continue }
                 if !Self.isFree(path) { occupied.insert(e.id) }
             }
-            let titles = Dictionary(
+            var titles = Dictionary(
                 ((try? deps.catalog()) ?? []).map { ($0.id, $0.title) }, uniquingKeysWith: { a, _ in a })
+            for task in MaintenanceTask.allCases { titles["maintenance-" + task.rawValue] = task.title }
+            titles["trash-bins"] = "Trash Bins"
+            titles["ollama-model-removal"] = "Ollama Model Removal"
             let batches = JournalHistory.batches(entries: entries, restorable: restorable)
             let plannedAutomation = Set(batches.lazy.filter { $0.interrupted && Self.isAutomation($0) }.map(\.id))
             // A busy lease cannot distinguish the worker's live batch from an earlier interruption.
@@ -357,7 +360,7 @@ public final class HistoryModel {
             if batch.kind != .removal { return organizeView(batch, loaded: loaded, formatter: formatter) }
             let perEntry = Dictionary(grouping: batch.items, by: \.catalogEntryID).mapValues(\.count)
             let rows = batch.items.map { item -> ReceiptRow in
-                let isReviewedFile = !TrashLedger.allowsPermanentDeletion(item.catalogEntryID)
+                let isReviewedFile = !TrashLedger.allowsPermanentDeletion(item.catalogEntryID) || item.catalogEntryID == "trash-bins"
                 let name = isReviewedFile
                     ? (item.originalPath.map { URL(fileURLWithPath: $0).lastPathComponent } ?? "File")
                     : (loaded.titles[item.catalogEntryID] ?? item.catalogEntryID)
@@ -366,7 +369,7 @@ public final class HistoryModel {
                    (perEntry[item.catalogEntryID] ?? 0) > 1, let path = item.originalPath {
                     title = Copy.Confirm.itemTitle(name, URL(fileURLWithPath: path).lastPathComponent)
                 }
-                let reversible = item.command == nil
+                let reversible = item.action != .command
                 return ReceiptRow(
                     title: title,
                     outcomeText: OutcomeText.text(for: item.outcome, reversible: reversible, appName: nil),

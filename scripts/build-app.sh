@@ -164,6 +164,6 @@ N="$("$APP/Contents/MacOS/Andromeda" --self-test-catalog)"
 history_version="$("$APP/Contents/MacOS/Andromeda" --self-test-release-history)"
 [ "$history_version" = "$VERSION" ] || die "bundled release history doesn't match the app version"
 echo "catalog entries: $N"
-[ "$N" = "41" ] || die "expected 41 catalog entries, got '$N'"
+[ "$N" = "42" ] || die "expected 42 catalog entries, got '$N'"
 
 step "done: $APP"

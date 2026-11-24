@@ -4,11 +4,13 @@ import Foundation
 /// transport: the XPC runner lives in AndromedaHelperClient.
 public enum PrivilegedOperation: Equatable, Sendable {
     case rebuildSpotlightIndex
+    case flushDNSCache
 
     /// What the journal records as the item's `command`.
     public var journalCommand: [String] {
         switch self {
         case .rebuildSpotlightIndex: ["diskplain-helper", "rebuildSpotlightIndex"]
+        case .flushDNSCache: ["diskplain-helper", "flushDNSCache"]
         }
     }
 }

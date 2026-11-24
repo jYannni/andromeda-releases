@@ -71,6 +71,11 @@ public final class Executor {
             var trashURL: URL?
             var externalDestination: Result<URL, Error>?
 
+            if case .removeOllamaModel(let model) = removal.action {
+                entry.command = ["Ollama", "remove", model.name]
+                entry.action = .command
+                entry.outcome = .planned
+            }
             if !removal.allowsPermanentDeletion, case .moveToTrash(let url) = removal.action {
                 entry.originalPath = url.path
                 entry.action = .trash
@@ -91,10 +96,12 @@ public final class Executor {
                         entry.duplicateDigest = check.digestData
                     }
                 }
+            }
+            if entry.outcome == .planned {
                 do {
                     try journal.append(entry)
                 } catch {
-                    let message = "The planned move couldn’t be saved to History."
+                    let message = "The planned action couldn’t be saved to History."
                     let result = RemovalResult(removal: removal, outcome: .failed(message), trashURL: nil,
                                                journalError: Self.describe(error))
                     results.append(result)
@@ -110,6 +117,7 @@ public final class Executor {
                 switch removal.action {
                 case .moveToTrash(let url): entry.originalPath = url.path; entry.action = .trash
                 case .runTool(let exe, let args): entry.command = [exe.path] + args; entry.action = .command
+                case .removeOllamaModel(let model): entry.command = ["Ollama", "remove", model.name]; entry.action = .command
                 case .privileged(let op): entry.command = op.journalCommand; entry.action = .command
                 }
             } else {
@@ -139,6 +147,8 @@ public final class Executor {
                     entry.command = op.journalCommand
                     entry.action = .command
                     entry.outcome = privileged?.run(op) ?? .skipped(.helperUnavailable)
+                case .removeOllamaModel(let model):
+                    entry.outcome = OllamaLocalModels.delete(model, using: tools)
                 }
             }
 
@@ -222,6 +232,8 @@ public final class Executor {
             guard imageCheck.url == url, imageCheck.verify(st, env: env) else {
                 return (.skipped(.changedSinceScan), nil, nil, nil)
             }
+        } else if let check = removal.toolCleanupCheck {
+            guard check.url == url, check.verify(st: st) else { return (.skipped(.changedSinceScan), nil, nil, nil) }
         } else {
             guard let expectation = removal.expectation else { return (.skipped(.changedSinceScan), nil, nil, nil) }
             let now = AllocatedSizer().size(of: target)

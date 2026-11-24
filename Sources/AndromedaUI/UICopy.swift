@@ -75,8 +75,12 @@ enum UICopy {
     // Overview
     static let overviewTitle = "Overview"
     static let overviewSubtitle = "What is using your disk, and what you can safely remove."
-    static let quickWinsTitle = "Cleanup suggestions"
-    static let quickWinsSubtitle = "Select the items below, then review what moves to Trash."
+    static let cleanupSuggestionsTitle = "Cleanup suggestions"
+    static let cleanupSuggestionsSubtitle = "Expand a folder type to see what uses space and how to review it."
+    static let cleanupReviewFirst = "Review first"
+    static let cleanupDownloadsDetail = "Review your downloaded files individually in Finder."
+    static let cleanupOpenDeveloper = "View in Developer"
+    static func cleanupSelected(_ count: Int) -> String { "\(count.formatted()) selected" }
     static let cardsHeading = "Worth knowing"
     static let whatYouCanDo = "What you can do"
     static func probablyCounted(_ bucketTitle: String) -> String { "Probably counted as \(bucketTitle)" }

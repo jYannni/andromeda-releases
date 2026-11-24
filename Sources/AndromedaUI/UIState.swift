@@ -8,6 +8,7 @@ import Observation
 @MainActor @Observable
 public final class UIState {
     public enum Destination: Hashable {
+        case tools, tool(ToolPage)
         case overview, page(AppleBucket), browseCategory(AppleBucket), browseFolder, storageMap, duplicates
         case drive(String), driveCatalogs, history, cloud, moveToCloud, organizeFolder, archives, spacePlan, scanComparison, storageTrends
         case reviewFolder(URL, StorageBrowser.FolderReference?)

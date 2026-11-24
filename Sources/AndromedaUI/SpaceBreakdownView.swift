@@ -13,7 +13,7 @@ struct SpaceBreakdownView: View {
                 if breakdown.unexplainedBytes > 0 {
                     evidence(
                         "Unattributed remainder", value: ByteFormat.string(breakdown.unexplainedBytes),
-                        detail: "The gap between disk usage and the space Andromeda could attribute. Its exact contents are unknown.")
+                        detail: "The gap between APFS container usage and measured categories. Snapshots, other volumes and incomplete folder scans can contribute to it.")
                 }
                 if let detail = breakdown.overcountDetail {
                     Text(detail).foregroundStyle(.secondary)
@@ -35,7 +35,9 @@ struct SpaceBreakdownView: View {
                         evidence(
                             "Locations Andromeda couldn’t read",
                             value: breakdown.unreadablePaths.count.formatted(),
-                            detail: "Their size is unknown. Expand to see the paths.")
+                            detail: breakdown.fullDiskAccess == .granted
+                                ? "File permissions and macOS protections can still limit reads after Full Disk Access. Expand to see which paths were unreadable."
+                                : "Their size is unknown. Expand to see the paths.")
                     }
                 }
                 if let snapshots = breakdown.snapshots, !snapshots.isEmpty {

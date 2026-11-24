@@ -107,6 +107,25 @@ public enum Copy {
             "Plus \(size) purgeable (estimate): macOS frees this on its own, and Storage settings counts it as available."
         }
         public static let barUnaccounted = "Not accounted for"
+
+        public static func cleanupSectorTitle(_ kind: CleanupSector.Kind) -> String {
+            switch kind {
+            case .projectBuilds: "Project build folders"
+            case .appCaches: "App caches"
+            case .packageCaches: "Package manager caches"
+            case .xcodeCaches: "Xcode caches"
+            case .simulatorCaches: "Simulator caches"
+            case .logs: "Logs and diagnostic reports"
+            case .mailDownloads: "Mail attachment downloads"
+            case .modelCaches: "Model download caches"
+            case .xcodeArchives: "Xcode archives"
+            case .temporaryFiles: "Temporary files and caches"
+            case .iosSimulators: "iOS and other Apple simulators"
+            case .androidEmulators: "Android emulators"
+            case .downloads: "Downloads"
+            case .other: "Other cleanup items"
+            }
+        }
     }
 
     public enum Buckets {
@@ -142,9 +161,9 @@ public enum Copy {
 
         public static let orphanedRuntimesTitle = "Orphaned simulator runtimes"
         public static let orphanedRuntimesBody =
-            "Old Xcode simulator runtimes can sit in /System/Library/AssetsV2 and take 25 to 150 GB. macOS protects that folder with System Integrity Protection, so Andromeda can show the size when it can read the folder but can't remove anything there."
+            "macOS protects simulator system assets. Andromeda can ask Xcode to remove registered runtimes that Xcode marks as removable. Orphaned assets that Xcode no longer lists may still use space."
         public static let orphanedRuntimesDo =
-            "Apple's supported fix is a clean reinstall of macOS. Until then they stay where they are, and nothing else is affected."
+            "Review runtimes listed under iOS and other Apple simulators or in Xcode Settings › Components."
 
         public static let pendingUpdateTitle = "A macOS update is holding space"
         public static let pendingUpdateBody =
@@ -332,8 +351,8 @@ extension Copy {
         public static let trashTitle = "Trash on this drive"
         public static let trashDetail = "Files trashed from this drive stay on it until the Trash is emptied."
         public static let trashHandoff = "Open the Trash"
-        public static let trashAfterwards = "Nothing is deleted until you empty the Trash in Finder."
-        public static let trashHowRemoved = "You empty it in Finder. Andromeda doesn't."
+        public static let trashAfterwards = "Items keep using space until they are permanently deleted."
+        public static let trashHowRemoved = "Review individual items in Tools → Trash Bins or open Trash in Finder."
         public static let spotlightTitle = "Spotlight index"
         public static let spotlightDetail = "macOS keeps a search index of this drive here, so Spotlight can find its files."
         public static let spotlightAfterwards = "macOS manages it and rebuilds it when it needs to."

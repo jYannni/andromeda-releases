@@ -30,10 +30,17 @@ struct DuplicatesView: View {
     @State private var previewTask: Task<Void, Never>?
     @State private var similarReviewTask: Task<Void, Never>?
 
+    init(model: AppModel, ui: UIState, startsInSimilarMode: Bool = false) {
+        self.model = model
+        self.ui = ui
+        _mode = State(initialValue: startsInSimilarMode ? .similar : .exact)
+    }
+
     var body: some View {
         PageColumn {
             PageHeader(title: "Duplicates", subtitle: mode.subtitle,
                        symbol: "doc.on.doc") {
+                if ui.destination == .tool(.similarImages) { ToolBackButton(ui: ui) }
                 if mode != .photos {
                     if !hiddenGroups.isEmpty {
                         Button("Hidden Groups…") { showsHiddenGroups = true }

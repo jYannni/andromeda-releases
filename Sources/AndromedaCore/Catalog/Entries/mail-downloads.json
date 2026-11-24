@@ -1,16 +1,17 @@
 {
   "id": "mail-downloads",
   "title": "Mail attachment downloads",
-  "explanation": "Mail saves copies of attachments here when you open them. The originals stay in your mailbox, and Mail saves a new copy the next time you open one.",
-  "consequence": "Attachments may open a little slower the first time while Mail copies them again.",
+  "explanation": "Mail saves local downloads of attachments when you open them. Some of these downloads may contain your edits.",
+  "consequence": "The Mail Attachments tool verifies each download against a copy in Apple Mail before offering to move it to Trash.",
   "paths": [
     "~/Library/Containers/com.apple.mail/Data/Library/Mail Downloads"
   ],
   "sizing": "allocated-walk",
   "bucket": "mail",
-  "tier": "safe",
+  "tier": "leave-it",
   "removal": {
-    "kind": "trash"
+    "kind": "handoff",
+    "instructions": "Open Tools → Mail Attachments to review matching downloads."
   },
   "apps_must_be_quit": [
     "com.apple.mail"

@@ -214,7 +214,8 @@ public final class ScanModel {
                 helperOn: helperOn, standardUser: accountsAnswer == .notPermitted, snapshots: snapshots,
                 applicationIDsByPath: Dictionary(observedApps.map { ($0.url, $0.application.id) },
                                                  uniquingKeysWith: { first, _ in first }),
-                nestedAppItems: apps.nestedItems)
+                nestedAppItems: apps.nestedItems,
+                downloadsBytes: large.folders[deps.env.home.appendingPathComponent("Downloads", isDirectory: true).path])
             if stopIfCancelled() { return }
             // Compare the same unprivileged measurement on each scan. Helper readings may cover a different scope.
             await comparisonHistory.record(result, folders: large.folders, listedDirectories: large.listedDirectories,

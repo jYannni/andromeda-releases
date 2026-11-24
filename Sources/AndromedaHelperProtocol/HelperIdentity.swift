@@ -10,7 +10,7 @@ public enum HelperIdentity {
     public static let automationWorkerBundleID = "io.github.jyannni.diskplain.automation"
     public static let plistName = "io.github.jyannni.diskplain.helper.plist"
     public static let teamID = "6K3XJ2VR2C"
-    public static let version = HelperBuildInfo.version
+    public static let version = HelperBuildInfo.version + ".2"
 
     /// Checked by the helper against the connecting app.
     public static var clientRequirement: String { requirement(identifier: appBundleID) }

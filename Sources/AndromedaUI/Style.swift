@@ -473,6 +473,22 @@ enum Style {
         }
     }
 
+    static func cleanupSectorSymbol(_ kind: CleanupSector.Kind) -> String {
+        switch kind {
+        case .projectBuilds: "hammer"
+        case .appCaches, .xcodeCaches: "internaldrive"
+        case .packageCaches, .modelCaches: "shippingbox"
+        case .simulatorCaches, .iosSimulators: "iphone"
+        case .logs: "doc.text"
+        case .mailDownloads: "envelope"
+        case .xcodeArchives: "archivebox"
+        case .temporaryFiles: "clock"
+        case .androidEmulators: "apps.iphone"
+        case .downloads: "arrow.down.to.line"
+        case .other: "folder"
+        }
+    }
+
     static func color(_ kind: BarSegment.Kind) -> Color {
         switch kind {
         case .bucket(let b): bucketColor(b)

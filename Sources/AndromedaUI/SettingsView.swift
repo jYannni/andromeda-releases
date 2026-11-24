@@ -12,6 +12,7 @@ public struct SettingsView: View {
     let showVersionHistory: (() -> Void)?
     let receivesPublicBetas: Binding<Bool>?
     let showsAutomationMenu: Binding<Bool>?
+    let showsStorageMenu: Binding<Bool>?
     @State private var helperSheet = false
     @State private var confirmRemove = false
     @State private var working = false
@@ -45,12 +46,14 @@ public struct SettingsView: View {
     }
 
     public init(model: AppModel, updater: SPUUpdater? = nil, showsAutomationMenu: Binding<Bool>? = nil,
+                showsStorageMenu: Binding<Bool>? = nil,
                 showVersionHistory: (() -> Void)? = nil, receivesPublicBetas: Binding<Bool>? = nil) {
         self.model = model
         self.updater = updater
         self.showVersionHistory = showVersionHistory
         self.receivesPublicBetas = receivesPublicBetas
         self.showsAutomationMenu = showsAutomationMenu
+        self.showsStorageMenu = showsStorageMenu
     }
 
     public var body: some View {
@@ -146,6 +149,9 @@ public struct SettingsView: View {
         switch pane {
         case .general:
             VStack(alignment: .leading, spacing: 16) {
+                if let showsStorageMenu {
+                    Toggle("Show storage in the menu bar", isOn: showsStorageMenu).card()
+                }
                 form(.general)
                 EnglishSpellingPicker(model: model).card()
             }

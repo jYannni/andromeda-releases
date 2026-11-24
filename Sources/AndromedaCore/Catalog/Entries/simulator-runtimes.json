@@ -1,10 +1,11 @@
 {
   "id": "simulator-runtimes",
   "title": "Simulator runtimes",
-  "explanation": "These disk images hold the simulator runtimes Xcode has downloaded, one for each iOS, watchOS or other OS version. Xcode manages them in Settings › Components.",
+  "explanation": "Each simulator runtime provides an OS version that multiple devices can share. Removing a runtime makes devices that depend on it unavailable.",
   "consequence": "Xcode downloads a runtime again if you need it to run a simulator.",
   "paths": [
-    "/Library/Developer/CoreSimulator/Images"
+    "/Library/Developer/CoreSimulator/Images",
+    "/Library/Developer/CoreSimulator/Cryptex/Images"
   ],
   "sizing": "allocated-walk",
   "bucket": "developer",

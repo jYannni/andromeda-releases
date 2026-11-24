@@ -6,6 +6,10 @@ struct DetailView: View {
     let model: AppModel
     let ui: UIState
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var scanButtonFrame = CGRect.zero
+    @State private var expansion: ScanExpansion?
+
     var body: some View {
         if case .drive(let id) = ui.destination {
             // Drives are scanned on their own, so the page doesn't wait on the main scan.
@@ -21,6 +25,10 @@ struct DetailView: View {
             ArchivesView(model: model, focusedArchive: ui.focusedRecord)
         } else if ui.destination == .spacePlan {
             SpacePlannerView(model: model, ui: ui)
+        } else if ui.destination == .tools {
+            ToolsView(model: model, ui: ui)
+        } else if case .tool(let page) = ui.destination {
+            tool(page).id(page)
         } else if ui.destination == .scanComparison {
             ScanComparisonView(model: model, ui: ui)
         } else if ui.destination == .storageTrends {
@@ -51,25 +59,117 @@ struct DetailView: View {
                 .id(folder)
         } else if ui.destination == .storageMap {
             FolderStorageView(model: model, ui: ui, startAtHome: true)
-        } else if model.isPreparingScan {
-            ScanningView(stage: .checkingAccess, stages: model.scan.stages)
         } else {
-            switch model.scan.state {
-            case .scanning(let stage):
-                ScanningView(
-                    stage: stage, stages: model.scan.stages, progress: model.scan.progress,
-                    startedAt: model.scan.startedAt, isCancelling: model.scan.isCancelling,
-                    onCancel: { model.scan.cancel() })
-            case .idle:
-                ScanPromptView(
-                    title: UICopy.readyTitle, message: UICopy.readyBody, button: UICopy.scan,
-                    disabled: !model.canScan) { Task { await model.scan() } }
-            case .failed:
-                ScanPromptView(
-                    title: UICopy.failedTitle, message: model.scanFailedText ?? "", button: UICopy.tryAgain,
-                    disabled: !model.canScan) { Task { await model.scan() } }
-            case .done: results
+            scanDetail
+        }
+    }
+
+    @ViewBuilder private func tool(_ page: ToolPage) -> some View {
+        switch page {
+        case .aiClutter: CleanupToolView(model: model, ui: ui, tool: .aiClutter)
+        case .mailAttachments: CleanupToolView(model: model, ui: ui, tool: .mailAttachments)
+        case .trashBins: TrashBinsView(model: model, ui: ui)
+        case .maintenance: MaintenanceView(model: model, ui: ui)
+        case .snapshots: SnapshotToolView(model: model, ui: ui)
+        case .downloads, .largeFiles: FolderStorageView(model: model, ui: ui, tool: page)
+        case .similarImages: DuplicatesView(model: model, ui: ui, startsInSimilarMode: true)
+        }
+    }
+
+    private var scanStage: ScanStage? {
+        if model.isPreparingScan { return .checkingAccess }
+        if case .scanning(let stage) = model.scan.state { return stage }
+        return nil
+    }
+
+    private var scanDetail: some View {
+        let stage = scanStage
+
+        return ZStack {
+            if let stage {
+                scanning(stage).transition(.identity)
+            } else {
+                switch model.scan.state {
+                case .idle:
+                    initialScanPrompt
+                        .transition(.asymmetric(insertion: .identity, removal: .opacity))
+                        .zIndex(1)
+                case .failed:
+                    ScanPromptView(
+                        title: UICopy.failedTitle, message: model.scanFailedText ?? "", disabled: !model.canScan
+                    ) {
+                        Button {
+                            Task { await model.scan() }
+                        } label: {
+                            Text(UICopy.tryAgain).frame(minWidth: 140)
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .controlSize(.large)
+                        .keyboardShortcut(.defaultAction)
+                    }
+                case .done: results
+                case .scanning: EmptyView()
+                }
             }
+        }
+        .background(Palette.canvas)
+        .overlay(alignment: .topLeading) {
+            if stage != nil, let expansion { expandingButton(expansion) }
+        }
+        .coordinateSpace(name: ScanExpansionSpace.detail)
+        .animation(expansion != nil && stage != nil ? .easeOut(duration: 0.14) : nil, value: stage != nil)
+        .onChange(of: reduceMotion) { if reduceMotion { expansion = nil } }
+        .onDisappear { expansion = nil }
+    }
+
+    private var initialScanPrompt: some View {
+        ScanPromptView(title: UICopy.readyTitle, message: UICopy.readyBody, disabled: !model.canScan) {
+            StartScanButton(action: startScan)
+                .onGeometryChange(for: CGRect.self) { $0.frame(in: .named(ScanExpansionSpace.detail)) } action: {
+                    scanButtonFrame = $0
+                }
+                .opacity(expansion == nil ? 1 : 0)
+        }
+    }
+
+    private func scanning(_ stage: ScanStage) -> ScanningView {
+        let preparing = model.isPreparingScan
+        return ScanningView(
+            stage: stage, stages: model.scan.stages, progress: preparing ? nil : model.scan.progress,
+            startedAt: preparing ? nil : model.scan.startedAt, isCancelling: model.scan.isCancelling,
+            onCancel: preparing ? nil : { model.scan.cancel() },
+            revealsContent: expansion == nil || expansion?.checklistFrame != nil,
+            onChecklistFrame: expandScanButton(to:))
+    }
+
+    private func expandingButton(_ expansion: ScanExpansion) -> some View {
+        ScanButtonExpansion(
+            from: expansion.buttonFrame, to: expansion.checklistFrame ?? expansion.buttonFrame,
+            progress: expansion.progress)
+            .transition(.identity)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
+    }
+
+    private func startScan() {
+        guard model.canScan else { return }
+        let launch = reduceMotion || scanButtonFrame.isEmpty ? nil : ScanExpansion(buttonFrame: scanButtonFrame)
+        expansion = launch
+        Task {
+            await model.scan()
+            if expansion?.id == launch?.id { expansion = nil }
+        }
+    }
+
+    private func expandScanButton(to frame: CGRect) {
+        guard !frame.isEmpty, let current = expansion else { return }
+        expansion?.checklistFrame = frame
+        guard current.checklistFrame == nil else { return }
+        withAnimation(.timingCurve(0.27, 0.72, 0.21, 1, duration: 0.52), completionCriteria: .logicallyComplete) {
+            expansion?.progress = 1
+        } completion: {
+            guard expansion?.id == current.id else { return }
+            expansion = nil
         }
     }
 
@@ -92,4 +192,13 @@ struct DetailView: View {
             OverviewView(model: model, ui: ui)
         }
     }
+}
+
+enum ScanExpansionSpace: Hashable { case detail }
+
+private struct ScanExpansion {
+    let id = UUID()
+    let buttonFrame: CGRect
+    var checklistFrame: CGRect?
+    var progress: CGFloat = 0
 }
