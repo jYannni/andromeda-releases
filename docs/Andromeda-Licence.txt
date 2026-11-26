@@ -1,0 +1,31 @@
+Andromeda Proprietary Software Licence
+
+Copyright © 2026 Yanko Thomson. All rights reserved.
+
+Source code
+
+The Andromeda source in this revision is proprietary. Access to the
+repository is limited to authorised collaborators. Copying, modification,
+or distribution of this source requires written permission from the
+copyright holder, except as permitted by law.
+
+Paid application
+
+If you obtain a paid copy of Andromeda from Yanko Thomson or an authorised
+seller, you may install and use it for personal or internal business use
+on one Mac at a time per purchased licence. You may move a licence to
+another Mac when you stop using it on the previous Mac. You may keep a
+backup copy for your own use. Redistribution and sublicensing require
+written permission from the copyright holder, except as permitted by law.
+
+Your statutory rights apply. Third-party components are covered by their
+own licences. The Sparkle notices are included in the application bundle.
+
+Earlier releases
+
+Andromeda and DiskPlain copies already distributed under the GNU General
+Public License v3.0 remain available under that licence. The terms above
+apply to the proprietary Andromeda source in this revision and to paid
+builds distributed with these terms.
+
+Published GPL releases and source: https://github.com/jYannni/andromeda-releases/releases

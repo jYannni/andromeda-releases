@@ -4,16 +4,16 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
     <channel>
         <title>Andromeda</title>
         <item>
-            <title>0.2.77</title>
-            <pubDate>Tue, 24 Nov 2026 10:21:24 +0200</pubDate>
+            <title>0.2.85</title>
+            <pubDate>Thu, 26 Nov 2026 11:45:46 +0200</pubDate>
             <link>https://jyannni.github.io/andromeda-releases/</link>
             <sparkle:channel>public-beta</sparkle:channel>
-            <sparkle:version>0.2.77</sparkle:version>
-            <sparkle:shortVersionString>0.2.77</sparkle:shortVersionString>
+            <sparkle:version>0.2.85</sparkle:version>
+            <sparkle:shortVersionString>0.2.85</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>26.0</sparkle:minimumSystemVersion>
             <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <sparkle:releaseNotesLink sparkle:edSignature="/va6gZUcLd9lPUW/0RDHJmRt7hlLkj/Ansy75xtaeVLQ5P7ozOmb1Sn5gwiLU1AOOTL1PmFqkUL0ApQM6wQoCw==" sparkle:length="2391">https://jyannni.github.io/andromeda-releases/updates/Andromeda-0.2.77-public-beta.md</sparkle:releaseNotesLink>
-            <enclosure url="https://github.com/jYannni/andromeda-releases/releases/download/v0.2.77-public-beta/Andromeda-0.2.77-public-beta.dmg" length="16919362" type="application/octet-stream" sparkle:edSignature="++99lEx5cppgs0HM5R6GWhHRA4WRXFza1DDXukuSfutUjJx1xRbXBxK2mur0zG2wsTMXpouCX6tMIhVRGNW/BA=="></enclosure>
+            <sparkle:releaseNotesLink sparkle:edSignature="6F2ttQnZTPnFUODEQQQqU0hkUXH+BM/cSn1ljg/BwVrkoD621cTpjH8Rp8uoAU9TuUoBHlwdGpc9RL9dPM3cBw==" sparkle:length="3023">https://jyannni.github.io/andromeda-releases/updates/Andromeda-0.2.85-public-beta.md</sparkle:releaseNotesLink>
+            <enclosure url="https://github.com/jYannni/andromeda-releases/releases/download/v0.2.85-public-beta/Andromeda-0.2.85-public-beta.dmg" length="17970802" type="application/octet-stream" sparkle:edSignature="gcRYxNJBnpyL5uI+ywGNDCDJC4uKQLOOVnBvfDjKivQt2W7bMHGHANpMOLShy6TTV2M12zBuvD/KEA8U8fpSBg=="></enclosure>
         </item>
     <item>
             <title>0.2.71</title>
@@ -28,6 +28,6 @@ IMPORTANT: This file was signed by Sparkle. Any modifications to this file requi
         </item>
     </channel>
 </rss><!-- sparkle-signatures:
-edSignature: 8KgO3P0fMEY9lX/lr5xYIY8arCRnzonVghHpJy98s3xzuehp9LzQeRNN0firgBeHaK6/c3w2e4sAUUWW3TuaBw==
+edSignature: h9Vyh5FKlun5zU3SzRo8ClaJMhrpNPl+s7IDt/Qvpf0Zp50wCoGzsGuk60KEDNfndcLCwUFyxH1fRaJyKk1HAQ==
 length: 2643
 -->
