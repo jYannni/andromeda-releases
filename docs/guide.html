@@ -1,0 +1,509 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="In-depth guides to Andromeda’s APFS sizing, System Data breakdown, deduplication, folder automation, offline drive catalogs, and verified archives.">
+  <meta property="og:title" content="Guide — Andromeda for macOS">
+  <meta property="og:description" content="In-depth guides to Andromeda’s APFS sizing, System Data breakdown, deduplication, folder automation, offline drive catalogs, and verified archives.">
+  <meta property="og:url" content="https://andromeda.yankothomson.com/guide.html">
+  <meta name="theme-color" content="#090910">
+  <title>Guide — Andromeda for macOS</title>
+  <link rel="canonical" href="https://andromeda.yankothomson.com/guide.html">
+  <link rel="icon" href="assets/icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="nav-wrap">
+    <header class="floating-nav" id="floating-nav" aria-label="Site">
+      <a class="brand" href="./">
+        <img src="assets/icon.png" width="28" height="28" alt="">
+        <span>Andromeda</span>
+      </a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="./#capabilities">Capabilities</a>
+        <a href="./#safety">Safety</a>
+        <a href="guide.html" aria-current="page">Guide</a>
+        <a href="./#faq">FAQ</a>
+      </nav>
+      <div class="nav-end">
+        <a class="btn-compact" href="download.html">Download now</a>
+        <button class="nav-menu-btn" type="button" id="nav-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-nav-drawer">
+          <svg class="nav-menu-icon-open" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3.5 6h13M3.5 10h13M3.5 14h13"/></svg>
+          <svg class="nav-menu-icon-close" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15"/></svg>
+        </button>
+      </div>
+    </header>
+    <nav class="mobile-nav-drawer" id="mobile-nav-drawer" aria-label="Mobile navigation" hidden>
+      <a href="./#capabilities">Capabilities</a>
+      <a href="./#safety">Safety</a>
+      <a href="guide.html" aria-current="page">Guide</a>
+      <a href="./#faq">FAQ</a>
+      <a class="mobile-nav-cta" href="download.html">Download now</a>
+    </nav>
+  </div>
+
+  <main id="main">
+    <section class="guide-shell">
+      <div class="frame-wide">
+        <div class="guide-breadcrumb">
+          <a href="./#capabilities" class="guide-back-link">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5 5.5 8 10 12.5"/></svg>
+            <span>All capabilities</span>
+          </a>
+          <span class="guide-crumb-sep" aria-hidden="true">/</span>
+          <span class="guide-crumb-current" id="guide-crumb-current">Guide</span>
+        </div>
+
+        <div class="guide-layout">
+          <aside class="guide-sidebar" aria-label="Guide topics">
+            <div class="guide-sidebar-heading">Andromeda Guide</div>
+            <nav class="guide-nav-list" id="guide-nav-list"></nav>
+          </aside>
+
+          <article class="guide-article" id="guide-article" aria-live="polite">
+            <p class="guide-category" id="guide-category"></p>
+            <h1 class="guide-title" id="guide-title">Loading guide…</h1>
+            <p class="guide-lede" id="guide-lede"></p>
+
+            <div class="guide-sections" id="guide-sections"></div>
+
+            <div class="guide-safety-note" id="guide-safety-note"></div>
+
+            <nav class="guide-pager" aria-label="Adjacent guides">
+              <a class="guide-pager-link" id="guide-prev" href="#">
+                <span class="guide-pager-dir">Previous guide</span>
+                <strong id="guide-prev-title"></strong>
+              </a>
+              <a class="guide-pager-link is-next" id="guide-next" href="#">
+                <span class="guide-pager-dir">Next guide</span>
+                <strong id="guide-next-title"></strong>
+              </a>
+            </nav>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <div class="closing-field">
+      <section class="closing-cta" aria-labelledby="guide-closing-title">
+        <h2 class="section-heading" id="guide-closing-title">Ready to understand your Mac’s storage?</h2>
+        <div class="hero-actions">
+          <a class="btn-primary" href="download.html">Download now</a>
+        </div>
+        <p class="hero-reassurance">Free download · Optional donations · Apple silicon · macOS 26 or later</p>
+      </section>
+
+      <footer class="frame-footer">
+        <div class="footer-plate">
+          <div class="footer-grid">
+            <div class="footer-identity">
+              <a class="brand" href="./">
+                <img src="assets/icon.png" width="34" height="34" alt="">
+                <span>Andromeda</span>
+              </a>
+              <p class="footer-summary">Storage, explained. Measure what fills your Mac, track what changed, and tidy folders or archive drives with reversible plans.</p>
+              <svg class="svg-defs-hidden" width="0" height="0" aria-hidden="true">
+                <defs>
+                  <linearGradient id="andromeda-brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4f9eff"/>
+                    <stop offset="56%" stop-color="#968aea"/>
+                    <stop offset="100%" stop-color="#c9c2ff"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="footer-social" aria-label="Social media">
+                <a class="footer-social-link" href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="Andromeda on LinkedIn" title="LinkedIn">
+                  <svg class="is-fill" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                </a>
+                <a class="footer-social-link" href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Andromeda on Facebook" title="Facebook">
+                  <svg class="is-fill" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/></svg>
+                </a>
+                <a class="footer-social-link" href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="Andromeda on X" title="X">
+                  <svg class="is-fill" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a class="footer-social-link" href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Andromeda on Instagram" title="Instagram">
+                  <svg class="is-stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle class="ig-dot" cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="footer-col-title">Product</h3>
+              <ul class="footer-list">
+                <li><a href="./#preview">Interface preview</a></li>
+                <li><a href="./#capabilities">Capabilities</a></li>
+                <li><a href="./#safety">Safety</a></li>
+                <li><a href="./#faq">FAQ</a></li>
+                <li><a href="download.html#download-faq">Updates &amp; releases</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="footer-col-title">Download &amp; Support</h3>
+              <ul class="footer-list">
+                <li><a href="download.html">Download .dmg</a></li>
+                <li><a href="download.html#donate">Optional Donations</a></li>
+                <li><a href="./#faq">Compatibility</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+
+  <script>
+    (function () {
+      const GUIDES = [
+        {
+          slug: 'apfs-sizing',
+          category: 'Disk Accounting',
+          title: 'Precise APFS space calculation',
+          lede: 'Modern macOS drives use Apple File System (APFS), where two files can share identical physical blocks through copy-on-write clones, sparse files, and hard links. Andromeda measures your disk the way macOS actually allocates blocks — and tells you honestly what deleting a folder will free.',
+          sections: [
+            {
+              heading: '“Uses” vs. “Frees at least”',
+              body: 'A classic frustration on APFS is deleting a 20 GB folder only to watch available space barely move because another snapshot or clone still references the same blocks. Andromeda separates reported allocation (“Uses”) from private physical blocks that belong exclusively to the selected items (“Frees at least”).'
+            },
+            {
+              heading: 'Check Shared Space inside any folder',
+              body: 'When inspecting any folder in Overview or Storage Map, you can run Check Shared Space to see whether files inside it share physical blocks with APFS clones or Time Machine local snapshots elsewhere on the volume.'
+            },
+            {
+              heading: 'Transparent accounting for macOS-restricted areas',
+              body: 'Every byte of your startup volume is accounted for in Overview. Areas where macOS restricts direct file listing are measured and surfaced cleanly under scan coverage details rather than silently omitted or guessed, and read-only accounting covers /Library, Homebrew, /usr/local, and system downloads.'
+            }
+          ],
+          safety: 'Read-only measurement: Andromeda inspects filesystem metadata and block extents locally without modifying file timestamps, Spotlight indexes, or permissions.'
+        },
+        {
+          slug: 'system-data',
+          category: 'Disk Accounting',
+          title: 'Expose “System Data”',
+          lede: 'macOS Storage settings frequently lumps tens or hundreds of gigabytes into an opaque “System Data” bar with no explanation. Andromeda maps that space with a curated 41-item catalog written in plain English.',
+          sections: [
+            {
+              heading: '41-item System Data catalog',
+              body: 'Andromeda identifies Xcode DerivedData, iOS and watchOS simulator runtimes, CoreSimulator caches, Homebrew and npm/pip caches, old iPhone/iPad backups, Time Machine local snapshots, Docker/VM disk images, and local AI model stores such as Ollama and LM Studio.'
+            },
+            {
+              heading: 'Safe to remove vs. Review first',
+              body: 'Cleanup suggestions are separated into two clear tiers. “Safe to remove” groups items macOS or your developer tools rebuild automatically (such as build outputs, package caches, and old logs). “Review first” highlights heavy items like simulator runtimes, offline media caches, and Downloads so you decide deliberately.'
+            },
+            {
+              heading: 'Storage Map, Quick Look & Pinned Folders',
+              body: 'Jump from any System Data category straight into an interactive folder view, press Space for instant Quick Look inspection, or pin recurring locations like build directories so they stay one click away.'
+            }
+          ],
+          safety: 'Every cleanup suggestion opens a full review sheet showing exact paths and sizes before anything moves to Trash.'
+        },
+        {
+          slug: 'what-changed',
+          category: 'Monitoring & History',
+          title: 'What changed? & Storage Trends',
+          lede: 'When 30 GB vanishes overnight, staring at a static pie chart rarely explains why. Andromeda tracks how your startup disk and watched folders evolve across days, months, and years.',
+          sections: [
+            {
+              heading: 'Compare any two scans',
+              body: 'Andromeda retains your 10 most recent scans so you can diff any two points in time, immediately spotlighting newly appeared directories, rapid 7/30/90-day growth, and folders that expanded between checks.'
+            },
+            {
+              heading: 'Storage Trends & CSV export',
+              body: 'Chart available disk space across 90-day, 1-year, and All-time horizons to spot gradual storage creep early. Export trend history as clean CSV whenever you want to log or inspect it outside the app.'
+            },
+            {
+              heading: 'Watched Folders & Low Power Mode awareness',
+              body: 'Watch high-churn folders (such as video exports, caches, or Downloads) against custom size limits. File-event checks measure what grew without requiring a full startup-disk rescan, automatically pause under Low Power Mode, and let you send growing folders straight to Space Plan.'
+            }
+          ],
+          safety: 'Scan history and trend charts are stored solely in your local user library and never leave your Mac.'
+        },
+        {
+          slug: 'duplicates',
+          category: 'Deduplication',
+          title: 'Exact Duplicates & Similar Images',
+          lede: 'Recover space safely across your Mac, external drives, and Apple Photos Library without risking accidental loss of originals or slightly edited versions.',
+          sections: [
+            {
+              heading: 'Cross-drive exact byte-for-byte Duplicates',
+              body: 'Matches identical files across local and connected external drives even when filenames differ. Before moving any duplicate to Trash, Andromeda rechecks both files byte-for-byte to guarantee nothing changed since the scan — files that match in size but differ by even a single byte are never flagged.'
+            },
+            {
+              heading: 'Similar Images perceptual review',
+              body: 'Surfaces resized, cropped, or re-encoded copies side-by-side with pixel dimensions and Quick Look previews. Use Keep Highest Resolution to auto-select the sharpest copy, or Hide Group for intentional variations you want to keep.'
+            },
+            {
+              heading: 'Apple Photos Library review',
+              body: 'Reviews up to 2,500 of your newest images using local previews, enforces keeping at least one photo in every group, and sends any removals safely to Photos’ Recently Deleted album rather than deleting permanently.'
+            }
+          ],
+          safety: 'External-drive duplicate removals record their volume UUID so History can restore the file the next time that drive reconnects.'
+        },
+        {
+          slug: 'app-cleanup',
+          category: 'Applications',
+          title: 'App Cleanup & Installer Finder',
+          lede: 'Dragging an app to Trash often leaves gigabytes of Application Support files, caches, crash logs, and user LaunchAgents behind. Andromeda surfaces everything tied to an app so you can remove it cleanly.',
+          sections: [
+            {
+              heading: 'Complete Uninstall App',
+              body: 'Inspect an app’s bundle alongside its related Library data, caches, preferences, crash reports, and user LaunchAgents in one review screen, or batch-uninstall multiple apps you no longer need.'
+            },
+            {
+              heading: 'Filter Intel-only or unused apps',
+              body: 'Quickly filter installed apps by architecture (such as Intel-only binaries running under Rosetta) or by last-opened date to identify forgotten software quietly holding gigabytes.'
+            },
+            {
+              heading: 'Installer Finder',
+              body: 'Automatically locates leftover .dmg disk images and .pkg installer packages across Downloads and watched folders so you can sweep already-installed installers in seconds.'
+            }
+          ],
+          safety: 'Andromeda never removes system-protected macOS apps and moves uninstalled app bundles and support folders to Trash with a recorded History entry.'
+        },
+        {
+          slug: 'organize',
+          category: 'Folder Organization',
+          title: 'Organize messy folders',
+          lede: 'Turn chaotic Downloads, Desktop, or project drop folders into clean, predictable structures without ever deleting a single file.',
+          sections: [
+            {
+              heading: 'Sort by kind, EXIF date & project',
+              body: 'Organize groups files by document kind, camera EXIF capture year/month, or related project clusters, while optionally tidying noisy suffixes like report-final-final.docx into clean names.'
+            },
+            {
+              heading: 'Preview every move before apply',
+              body: 'Before a single file moves, Andromeda builds a complete side-by-side plan showing exact folder counts, destinations, and renames. You can inspect every group, exclude individual items, or route files into folders you already own.'
+            },
+            {
+              heading: 'Protected areas & group-by-group Undo',
+              body: 'Code repositories, app bundles, packages, symlinks, ~/Library, and active downloads are automatically left untouched. Every completed run is journaled so you can undo an individual group or the entire batch from History at any time.'
+            }
+          ],
+          safety: 'Organize never deletes files. Mid-run crash recovery guarantees every path and inode restores cleanly even if your Mac loses power mid-operation.'
+        },
+        {
+          slug: 'automation',
+          category: 'Folder Automation',
+          title: 'Automated rules & on-device OCR',
+          lede: 'Build local filing workflows that sort incoming invoices, screenshots, exports, and receipts automatically — powered by nested rule logic and on-device OCR.',
+          sections: [
+            {
+              heading: 'Nested All / Any / None conditions',
+              body: 'Combine filename patterns, file kinds, Finder tags, file size, age, and nested All / Any / None groups with dynamic destination templates such as {year}/{month}.'
+            },
+            {
+              heading: 'Local “Contents contain” & on-device OCR',
+              body: 'Match text inside PDFs and OCR-scanned images completely offline using Apple silicon’s native Vision engine — no cloud OCR uploads and no external API keys.'
+            },
+            {
+              heading: 'Verified Back Up, Then Move & menu-bar control',
+              body: 'For critical documents, use Back Up, Then Move to copy and verify bytes before filing. Pause or resume automation anytime from the menu bar, and let eligible Copy or Ignore rules keep running cleanly even after Quit.'
+            }
+          ],
+          safety: 'Every automation rule can be dry-run previewed against a real folder before turning it on, and every automated move is logged in History.'
+        },
+        {
+          slug: 'drive-catalogs',
+          category: 'External Drives',
+          title: 'Offline Drive Catalogs',
+          lede: 'Stop plugging in five external SSDs just to find one clip or archive folder. Andromeda keeps a fast, searchable offline catalog of every drive on your desk or shelf.',
+          sections: [
+            {
+              heading: 'Dedicated External Drive pages',
+              body: 'Every connected external drive gets its own live overview page, background Browse Files and Folders, automatic scan refresh on reconnect, offline What changed? diffs, and UUID-tied Undo that waits patiently until the drive is plugged back in.'
+            },
+            {
+              heading: 'Instant offline search (⇧⌘F) with rich previews',
+              body: 'Index full drives or specific APFS folders with optional Image, PDF, and Video thumbnails. Filter across unplugged drives by 4K+ resolution, video codec, 50/100+ fps frame rate, camera model, file size, and creation date.'
+            },
+            {
+              heading: 'Shelf locations, notes & Catalog Collections',
+              body: 'Tag each disk with its physical location (such as “Shelf B · Pelican Case 2”) and disconnect reminders. Save recurring searches and export cross-drive Catalog Collections as verified folders or ZIP archives.'
+            }
+          ],
+          safety: 'Catalog indexes and thumbnails live locally on your Mac with zero cloud syncing required.'
+        },
+        {
+          slug: 'external-archives',
+          category: 'Archiving',
+          title: 'Verified External Archives',
+          lede: 'Move finished video projects, photo shoots, or repositories off your startup SSD onto external APFS disks with cryptographic proof that every byte arrived intact.',
+          sections: [
+            {
+              heading: 'SHA-256 verification & portable manifests',
+              body: 'Andromeda copies projects to a separate APFS disk, verifies bytes, POSIX permissions, extended attributes (xattrs), and symlinks, and writes a standard Andromeda Checksums.sha256 manifest right inside the archive so you can verify it decades from now with standard command-line tools.'
+            },
+            {
+              heading: 'Clone-backed Archive Versions',
+              body: 'Update an existing archive without duplicating unchanged gigabytes: Andromeda stores new snapshots using APFS clones for untouched files while verifying every modified file.'
+            },
+            {
+              heading: 'Second-disk replication & 30-day health checks',
+              body: 'Duplicate verified archives to a second backup disk for 3-2-1 resilience, and let Andromeda run automatic 30-day integrity checks whenever an archive drive reconnects.'
+            }
+          ],
+          safety: 'Source folders on your Mac are never removed until full byte-for-byte SHA-256 verification passes and you confirm the handoff.'
+        },
+        {
+          slug: 'space-plan',
+          category: 'Recovery Planning',
+          title: 'Space Plan & Cloud Offload',
+          lede: 'Need to free 80 GB before an OS update or a film edit? Space Plan brings cleanups, verified external archives, and cloud offload together under one clear target.',
+          sections: [
+            {
+              heading: 'One unified recovery goal',
+              body: 'Queue safe cleanups from Overview, growing directories from What changed?, duplicate sets, and external archive candidates into a single Space Plan with a live running total of how much private space you will actually reclaim.'
+            },
+            {
+              heading: 'Move to Cloud with receipts & Undo',
+              body: 'Offload large folders to iCloud Drive, Google Drive, Dropbox, or OneDrive with a recorded move receipt, Finder reveal shortcuts, and straightforward Undo if you need the files back in their original location.'
+            },
+            {
+              heading: 'Mark essentials Keep Local',
+              body: 'Protect active projects, reference libraries, or travel files by marking them Keep Local so Space Plan and cloud suggestions never propose evicting files you need offline.'
+            }
+          ],
+          safety: 'Nothing executes while building a Space Plan — you review the full combined summary and apply only when ready.'
+        }
+      ];
+
+      function getTopicSlug() {
+        const params = new URLSearchParams(window.location.search);
+        const q = params.get('topic');
+        if (q) return q;
+        const pathMatch = window.location.pathname.match(/\/guide\/([^/]+)\/?$/);
+        if (pathMatch && pathMatch[1]) return decodeURIComponent(pathMatch[1]);
+        return GUIDES[0].slug;
+      }
+
+      const navList = document.getElementById('guide-nav-list');
+      const crumbCurrent = document.getElementById('guide-crumb-current');
+      const categoryEl = document.getElementById('guide-category');
+      const titleEl = document.getElementById('guide-title');
+      const ledeEl = document.getElementById('guide-lede');
+      const sectionsEl = document.getElementById('guide-sections');
+      const safetyEl = document.getElementById('guide-safety-note');
+      const prevEl = document.getElementById('guide-prev');
+      const prevTitleEl = document.getElementById('guide-prev-title');
+      const nextEl = document.getElementById('guide-next');
+      const nextTitleEl = document.getElementById('guide-next-title');
+
+      function renderGuide(slug, pushHistory) {
+        const idx = Math.max(0, GUIDES.findIndex((g) => g.slug === slug));
+        const guide = GUIDES[idx];
+
+        document.title = guide.title + ' — Andromeda Guide';
+        crumbCurrent.textContent = guide.title;
+        categoryEl.textContent = guide.category;
+        titleEl.textContent = guide.title;
+        ledeEl.textContent = guide.lede;
+
+        sectionsEl.innerHTML = '';
+        guide.sections.forEach((sec) => {
+          const block = document.createElement('section');
+          block.className = 'guide-block';
+          const h2 = document.createElement('h2');
+          h2.textContent = sec.heading;
+          const p = document.createElement('p');
+          p.textContent = sec.body;
+          block.appendChild(h2);
+          block.appendChild(p);
+          sectionsEl.appendChild(block);
+        });
+
+        safetyEl.innerHTML = '';
+        const safetyLabel = document.createElement('strong');
+        safetyLabel.textContent = 'Safety guarantee';
+        const safetyBody = document.createElement('p');
+        safetyBody.textContent = guide.safety;
+        safetyEl.appendChild(safetyLabel);
+        safetyEl.appendChild(safetyBody);
+
+        const prevGuide = GUIDES[(idx - 1 + GUIDES.length) % GUIDES.length];
+        const nextGuide = GUIDES[(idx + 1) % GUIDES.length];
+        prevEl.href = 'guide.html?topic=' + prevGuide.slug;
+        prevEl.dataset.slug = prevGuide.slug;
+        prevTitleEl.textContent = prevGuide.title;
+        nextEl.href = 'guide.html?topic=' + nextGuide.slug;
+        nextEl.dataset.slug = nextGuide.slug;
+        nextTitleEl.textContent = nextGuide.title;
+
+        Array.from(navList.querySelectorAll('a')).forEach((a) => {
+          const active = a.dataset.slug === guide.slug;
+          a.classList.toggle('is-active', active);
+          if (active) a.setAttribute('aria-current', 'page');
+          else a.removeAttribute('aria-current');
+        });
+
+        if (pushHistory && window.history && window.history.pushState) {
+          window.history.pushState({ slug: guide.slug }, '', 'guide.html?topic=' + guide.slug);
+        }
+      }
+
+      GUIDES.forEach((g) => {
+        const a = document.createElement('a');
+        a.className = 'guide-nav-item';
+        a.href = 'guide.html?topic=' + g.slug;
+        a.dataset.slug = g.slug;
+        a.textContent = g.title;
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          renderGuide(g.slug, true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+        navList.appendChild(a);
+      });
+
+      [prevEl, nextEl].forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          renderGuide(link.dataset.slug, true);
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+
+      window.addEventListener('popstate', () => {
+        renderGuide(getTopicSlug(), false);
+      });
+
+      renderGuide(getTopicSlug(), false);
+
+      /* Scroll progress & floating nav */
+      const progressBar = document.getElementById('scroll-progress');
+      const floatingNav = document.getElementById('floating-nav');
+      function onScroll() {
+        const y = window.scrollY || 0;
+        const max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+        if (progressBar) progressBar.style.transform = 'scaleX(' + Math.min(1, Math.max(0, y / max)) + ')';
+        if (floatingNav) floatingNav.classList.toggle('is-scrolled', y > 24);
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      /* Mobile nav drawer */
+      const menuBtn = document.getElementById('nav-menu-btn');
+      const drawer = document.getElementById('mobile-nav-drawer');
+      if (menuBtn && drawer) {
+        menuBtn.addEventListener('click', () => {
+          const open = menuBtn.getAttribute('aria-expanded') === 'true';
+          menuBtn.setAttribute('aria-expanded', String(!open));
+          drawer.hidden = open;
+        });
+        drawer.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => {
+            menuBtn.setAttribute('aria-expanded', 'false');
+            drawer.hidden = true;
+          });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

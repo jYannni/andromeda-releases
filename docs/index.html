@@ -3,30 +3,1858 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Download Andromeda, a free storage utility for macOS.">
-  <title>Andromeda for Mac</title>
-  <link rel="icon" href="icon.png" type="image/png">
-  <style>
-    :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
-    body { color: CanvasText; background: Canvas; margin: 0; }
-    main { max-width: 35rem; margin: 0 auto; padding: clamp(2rem, 10vw, 6rem) 1.5rem; }
-    h1 { margin: .4rem 0; font-size: clamp(2.7rem, 10vw, 4.7rem); letter-spacing: -.055em; }
-    p { line-height: 1.6; }
-    .download { display: inline-block; margin: .4rem 0; padding: .7rem 1rem; border-radius: .65rem; color: white; background: #37318b; font-weight: 650; text-decoration: none; }
-    nav { display: flex; gap: 1.2rem; flex-wrap: wrap; margin-top: 1.6rem; }
-  </style>
+  <meta name="description" content="See what uses space on your Mac, understand what changed, and tidy folders or archive drives with Andromeda.">
+  <meta property="og:title" content="Andromeda — Understand your Mac’s storage">
+  <meta property="og:description" content="See what uses space on your Mac, understand what changed, and tidy folders or archive drives with Andromeda.">
+  <meta property="og:url" content="https://andromeda.yankothomson.com/">
+  <meta name="theme-color" content="#090910">
+  <title>Andromeda — Understand your Mac’s storage</title>
+  <link rel="canonical" href="https://andromeda.yankothomson.com/">
+  <link rel="icon" href="assets/icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <main>
-    <img src="icon.png" width="88" height="88" alt="">
-    <h1>Andromeda</h1>
-    <p>See what fills your Mac, understand what changed, and review what to clean up or organize.</p>
-    <a class="download" href="https://github.com/jYannni/andromeda-releases/releases/latest">Download for Mac</a>
-    <p>Apple silicon · macOS 26 or later</p>
-    <nav aria-label="Project links">
-      <a href="https://github.com/jYannni/andromeda-releases">Source on GitHub</a>
-      <a href="updates/appcast.xml">Sparkle update feed</a>
+  <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <div class="nav-wrap">
+    <header class="floating-nav" id="floating-nav" aria-label="Site">
+      <a class="brand" href="./">
+        <img src="assets/icon.png" width="28" height="28" alt="">
+        <span>Andromeda</span>
+      </a>
+      <nav class="nav-links" aria-label="Main">
+        <a href="#capabilities">Capabilities</a>
+        <a href="#safety">Safety</a>
+        <a href="guide.html">Guide</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav-end">
+        <a class="btn-compact" href="download.html">Download now</a>
+        <button class="nav-menu-btn" type="button" id="nav-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="mobile-nav-drawer">
+          <svg class="nav-menu-icon-open" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M3.5 6h13M3.5 10h13M3.5 14h13"/></svg>
+          <svg class="nav-menu-icon-close" width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M5 5l10 10M15 5 5 15"/></svg>
+        </button>
+      </div>
+    </header>
+    <nav class="mobile-nav-drawer" id="mobile-nav-drawer" aria-label="Mobile navigation" hidden>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#safety">Safety</a>
+      <a href="guide.html">Guide</a>
+      <a href="#faq">FAQ</a>
+      <a class="mobile-nav-cta" href="download.html">Download now</a>
     </nav>
+  </div>
+
+  <main id="main">
+    <!-- Chapter 1: Scroll-Pinned 3D Axis-Spinning Galaxy → Andromeda Core & Arms Logo Hero -->
+    <section class="hero-scroll-track" id="hero-track" aria-labelledby="hero-title">
+      <div class="hero-sticky">
+        <div class="galaxy-nebula" id="galaxy-nebula" aria-hidden="true"></div>
+
+        <!-- Above the galaxy: headline starts closer in and glides up as the galaxy tilts face-on -->
+        <div class="hero-top" id="hero-top">
+          <h1 class="hero-title" id="hero-title">See where your <span class="accent-spectrum">space went.</span></h1>
+        </div>
+
+        <!-- Centerpiece: 3D Andromeda galaxy spins on its own axis, tilts face-on, then morphs into core & spiral arms -->
+        <div class="galaxy-centerpiece" aria-hidden="true">
+          <div class="galaxy-morph-stage" id="galaxy-morph-stage">
+            <div class="galaxy-core-halo" id="galaxy-core-halo"></div>
+            <canvas class="galaxy-canvas-el" id="galaxy-canvas"></canvas>
+
+            <!-- Exact Andromeda Logo Mark: Core & Spiral Arms ONLY (from AppIcon.icon/Assets) -->
+            <svg class="galaxy-logo-mark" id="galaxy-logo-mark" viewBox="0 0 1024 1024" fill="none">
+              <defs>
+                <linearGradient id="logo-arm-a" x1="179" y1="236" x2="850" y2="619" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#4F9EFF"/>
+                  <stop offset="52%" stop-color="#968AEA"/>
+                  <stop offset="100%" stop-color="#6B62B8"/>
+                </linearGradient>
+                <linearGradient id="logo-arm-b" x1="842" y1="786" x2="174" y2="408" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#75B4FF"/>
+                  <stop offset="52%" stop-color="#C9C2FF"/>
+                  <stop offset="100%" stop-color="#554D96"/>
+                </linearGradient>
+                <radialGradient id="logo-core-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#FFF8E8" stop-opacity="1"/>
+                  <stop offset="55%" stop-color="#FFEAD0" stop-opacity="0.88"/>
+                  <stop offset="100%" stop-color="#968AEA" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <g transform="rotate(-18 512 512)">
+                <path fill="url(#logo-arm-a)" d="M179 480 C225 344 369 249 536 236 C711 222 842 307 850 414 C858 518 754 611 626 619 C600 621 577 618 557 612 C637 590 715 535 719 470 C724 405 650 361 550 356 C409 348 279 397 179 480Z"/>
+                <path fill="url(#logo-arm-b)" d="M842 548 C793 690 641 774 485 786 C311 799 184 718 174 611 C164 508 259 420 379 408 C410 404 438 406 462 414 C382 434 310 486 304 550 C297 615 371 663 474 668 C615 676 741 627 842 548Z"/>
+              </g>
+              <ellipse cx="512" cy="512" rx="122" ry="92" fill="url(#logo-core-glow)" transform="rotate(-22 512 512)"/>
+              <ellipse cx="512" cy="512" rx="79" ry="58" fill="#FFF2DC" transform="rotate(-22 512 512)"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Below the galaxy: lede, CTA, and reassurance -->
+        <div class="hero-bottom" id="hero-bottom">
+          <p class="hero-lede">Understand what fills your Mac — including the “System Data” macOS won’t explain — catch what grew between scans, and tidy folders or archive drives without losing control.</p>
+          <div class="hero-actions">
+            <a class="btn-primary" href="download.html">Download now</a>
+          </div>
+          <p class="hero-reassurance">Free download · Optional donations · Apple silicon Macs running macOS 26 or later</p>
+        </div>
+
+        <div class="hero-scroll-cue" aria-hidden="true">
+          <span class="hero-scroll-trackbar"><span class="hero-scroll-fill" id="hero-scroll-fill"></span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 1B: Interactive Andromeda macOS Window inside Space Black MacBook Pro -->
+    <section class="preview-stage" id="preview" aria-labelledby="preview-title">
+      <div class="frame">
+        <div class="section-header reveal">
+          <h2 class="section-heading" id="preview-title">Storage, <span class="accent-spectrum">explained.</span></h2>
+        </div>
+      </div>
+
+      <div class="frame-wide macbook-stage-wrap">
+        <div class="macbook-stage reveal" id="hero-shell">
+          <div class="macbook-lid">
+            <div class="macbook-screen">
+              <!-- Subtle Andromeda Blue-to-Purple macOS Wallpaper -->
+              <div class="macbook-wallpaper" aria-hidden="true"></div>
+
+              <!-- Authentic MacBook Pro Camera Notch & Translucent macOS Menu Bar -->
+              <div class="macbook-menubar" aria-hidden="true">
+                <div class="menubar-left">
+                  <svg class="menubar-apple" viewBox="0 0 14 17" fill="currentColor" aria-hidden="true"><path d="M11.6 9.1c0-1.9 1.5-2.8 1.6-2.9-.9-1.3-2.2-1.4-2.7-1.5-1.1-.1-2.2.7-2.8.7-.6 0-1.5-.7-2.4-.7-1.2 0-2.4.7-3 1.8-1.3 2.3-.3 5.6.9 7.4.6.9 1.3 1.9 2.3 1.9.9 0 1.3-.6 2.4-.6s1.4.6 2.4.6c1 0 1.6-.9 2.2-1.8.7-1 1-2 1-2.1-.1 0-1.9-.7-1.9-2.8zM9.7 3.4c.5-.6.9-1.5.8-2.4-.8 0-1.7.5-2.2 1.1-.5.6-.9 1.5-.8 2.3.8.1 1.7-.4 2.2-1z"/></svg>
+                  <span class="menubar-app">Andromeda</span>
+                  <span>File</span>
+                  <span>Edit</span>
+                  <span>View</span>
+                  <span>Window</span>
+                  <span>Help</span>
+                </div>
+                <div class="macbook-notch">
+                  <span class="macbook-camera"></span>
+                </div>
+                <div class="menubar-right">
+                  <svg class="menubar-icon" viewBox="0 0 16 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1.5 4.2a9.6 9.6 0 0 1 13 0M4.2 7a6 6 0 0 1 7.6 0M6.8 9.8a2.2 2.2 0 0 1 2.4 0"/></svg>
+                  <span class="menubar-battery"><span></span></span>
+                  <span>Mon 18:29</span>
+                </div>
+              </div>
+
+              <div class="macbook-desktop">
+                <div class="macos-window" role="region" aria-label="Interactive preview of Andromeda’s macOS interface">
+            <!-- Authentic SidebarView.swift structure -->
+            <aside class="macos-sidebar" aria-label="App navigation">
+              <div class="macos-traffic" aria-hidden="true">
+                <div class="traffic-lights">
+                  <span class="traffic-light tl-red"></span>
+                  <span class="traffic-light tl-yellow"></span>
+                  <span class="traffic-light tl-green"></span>
+                </div>
+              </div>
+
+              <div class="sidebar-masthead">
+                <img src="assets/icon.png" width="34" height="34" alt="">
+                <div>
+                  <div class="sidebar-wordmark">Andromeda</div>
+                  <div class="sidebar-scanned">Scanned 23 Nov 2026 at 18:29</div>
+                </div>
+              </div>
+
+              <div class="sidebar-groups" role="tablist" aria-label="Andromeda screens">
+                <div class="sidebar-group">
+                  <button class="sidebar-btn" type="button" role="tab" id="nav-overview" aria-selected="true" aria-controls="view-overview" data-crumb="Overview">
+                    <span class="sidebar-btn-left">
+                      <svg class="sidebar-glyph" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1.5a6.5 6.5 0 1 0 6.5 6.5H8V1.5zm1.5 0V6.5h5A6.52 6.52 0 0 0 9.5 1.5z"/></svg>
+                      <span>Overview</span>
+                    </span>
+                  </button>
+                  <button class="sidebar-btn" type="button" role="tab" id="nav-changed" aria-selected="false" aria-controls="view-changed" data-crumb="What changed?">
+                    <span class="sidebar-btn-left">
+                      <svg class="sidebar-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13V3m0 0L2.5 5.5M5 3l2.5 2.5M11 3v10m0 0-2.5-2.5M11 13l2.5-2.5"/></svg>
+                      <span>What changed?</span>
+                    </span>
+                  </button>
+                  <div class="sidebar-btn is-static" aria-hidden="true">
+                    <span class="sidebar-btn-left">
+                      <svg class="sidebar-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 12.5h11M3.5 10 6.5 7l2.5 2 3.5-4.5"/></svg>
+                      <span>Storage Trends</span>
+                    </span>
+                  </div>
+                  <div class="sidebar-btn is-static" aria-hidden="true">
+                    <span class="sidebar-btn-left">
+                      <svg class="sidebar-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8a5 5 0 1 0 1.4-3.5L3 6"/><path d="M3 3v3h3M8 5.2V8l2 1.2"/></svg>
+                      <span>History</span>
+                    </span>
+                  </div>
+                </div>
+
+                <div class="sidebar-group">
+                  <div class="sidebar-group-title">Storage</div>
+                  <div class="sidebar-btn is-static" aria-hidden="true">
+                    <span class="sidebar-btn-left"><span>Applications</span></span>
+                    <span class="sidebar-size">54.01 GB</span>
+                  </div>
+                  <div class="sidebar-btn is-static" aria-hidden="true">
+                    <span class="sidebar-btn-left"><span>Documents</span></span>
+                    <span class="sidebar-size">81.54 GB</span>
+                  </div>
+                  <div class="sidebar-btn is-static" aria-hidden="true">
+                    <span class="sidebar-btn-left"><span>Developer</span></span>
+                    <span class="sidebar-size">40.11 GB</span>
+                  </div>
+                  <div class="sidebar-btn is-static" aria-hidden="true">
+                    <span class="sidebar-btn-left"><span>macOS</span></span>
+                    <span class="sidebar-size">26.5 GB</span>
+                  </div>
+                  <div class="sidebar-btn is-static" aria-hidden="true">
+                    <span class="sidebar-btn-left"><span>System Data</span></span>
+                    <span class="sidebar-size">210.59 GB</span>
+                  </div>
+                  <button class="sidebar-btn" type="button" role="tab" id="nav-duplicates" aria-selected="false" aria-controls="view-duplicates" data-crumb="Duplicates">
+                    <span class="sidebar-btn-left">
+                      <svg class="sidebar-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="2.5" width="7.5" height="9" rx="1.5"/><path d="M6 11.5v1a1.5 1.5 0 0 0 1.5 1.5h5a1.5 1.5 0 0 0 1.5-1.5V6A1.5 1.5 0 0 0 12.5 4.5H10"/></svg>
+                      <span>Duplicates</span>
+                    </span>
+                  </button>
+                </div>
+
+                <div class="sidebar-group">
+                  <div class="sidebar-group-title">Drives &amp; Folders</div>
+                  <button class="sidebar-btn" type="button" role="tab" id="nav-catalogs" aria-selected="false" aria-controls="view-catalogs" data-crumb="Drive Catalogs">
+                    <span class="sidebar-btn-left">
+                      <svg class="sidebar-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4.5" width="12" height="7" rx="2"/><circle cx="11.5" cy="8" r="0.8" fill="currentColor"/></svg>
+                      <span>Drive Catalogs</span>
+                    </span>
+                  </button>
+                  <button class="sidebar-btn" type="button" role="tab" id="nav-organize" aria-selected="false" aria-controls="view-organize" data-crumb="Organize a folder">
+                    <span class="sidebar-btn-left">
+                      <svg class="sidebar-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h3l1.4 1.5h4.6A1.5 1.5 0 0 1 14 6v5.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 11.5v-7z"/></svg>
+                      <span>Organize a folder</span>
+                    </span>
+                  </button>
+                </div>
+              </div>
+            </aside>
+
+            <!-- Authentic macOS PageColumn area -->
+            <div class="macos-main">
+              <div class="macos-toolbar">
+                <span class="toolbar-crumb" id="toolbar-crumb">Overview</span>
+                <button class="toolbar-pill-btn" type="button" id="toolbar-rescan">Scan again</button>
+              </div>
+
+              <!-- View 1: OverviewView.swift + SpaceBarView.swift -->
+              <div class="macos-page is-active" role="tabpanel" id="view-overview" aria-labelledby="nav-overview">
+                <div class="app-page-header">
+                  <div class="app-header-left">
+                    <span class="symbol-tile" aria-hidden="true">
+                      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10 2a8 8 0 1 0 8 8h-8V2zm2 0v6h6a8.02 8.02 0 0 0-6-6z"/></svg>
+                    </span>
+                    <div>
+                      <div class="app-page-title">Overview</div>
+                      <div class="app-page-subtitle">What is using your disk, and what you can safely remove.</div>
+                    </div>
+                  </div>
+                  <div class="app-header-actions">
+                    <button class="toolbar-pill-btn" type="button" data-jump-tab="nav-changed">What changed?</button>
+                    <button class="toolbar-pill-btn is-prominent" type="button" data-jump-tab="nav-organize">Resume Space Plan</button>
+                  </div>
+                </div>
+
+                <div class="app-card">
+                  <div class="gauge-head">
+                    <div>
+                      <span class="gauge-used">431.14 GB</span>
+                      <span class="gauge-cap">used of 494.38 GB</span>
+                    </div>
+                    <span class="gauge-avail">63.24 GB available</span>
+                  </div>
+
+                  <div class="space-bar-track" id="space-bar-track" aria-label="Disk usage breakdown by macOS category">
+                    <span class="space-bar-seg sb-apps" title="Applications: 54.01 GB"></span>
+                    <span class="space-bar-seg sb-docs" title="Documents: 81.54 GB"></span>
+                    <span class="space-bar-seg sb-mail" title="Mail: 43.7 MB"></span>
+                    <span class="space-bar-seg sb-messages" title="Messages: 930.1 MB"></span>
+                    <span class="space-bar-seg sb-icloud" title="iCloud Drive: 1.8 GB"></span>
+                    <span class="space-bar-seg sb-dev" title="Developer: 40.11 GB"></span>
+                    <span class="space-bar-seg sb-other" title="Other Users &amp; Shared: 4.4 GB"></span>
+                    <span class="space-bar-seg sb-macos" title="macOS: 26.5 GB"></span>
+                    <span class="space-bar-seg sb-sys" title="System Data: 210.59 GB"></span>
+                    <span class="space-bar-seg sb-gap" title="Not accounted for: 11.23 GB"></span>
+                  </div>
+
+                  <div class="space-legend">
+                    <span class="space-legend-item"><span class="swatch swatch-apps"></span>Applications <em>54.01 GB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-docs"></span>Documents <em>81.54 GB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-mail"></span>Mail <em>43.7 MB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-messages"></span>Messages <em>930.1 MB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-icloud"></span>iCloud Drive <em>1.8 GB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-dev"></span>Developer <em>40.11 GB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-other"></span>Other Users &amp; Shared <em>4.4 GB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-macos"></span>macOS <em>26.5 GB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-sys"></span>System Data <em>210.59 GB</em></span>
+                    <span class="space-legend-item"><span class="swatch swatch-gap"></span>Not accounted for <em>11.23 GB</em></span>
+                  </div>
+
+                  <div class="app-card-divider"></div>
+                  <div class="gauge-footnote">
+                    <strong>419.91 GB allocated across scanned categories</strong><br>
+                    The chart adds up file and folder sizes. APFS can share the same disk space between files.<br>
+                    Plus 11.76 GB purgeable (estimate): macOS frees this on its own, and Storage settings counts it as available.
+                  </div>
+                </div>
+
+                <div class="suggestions-bar">
+                  <div>
+                    <h3>Cleanup suggestions</h3>
+                    <p>Expand a folder type to see what uses space and how to review it.</p>
+                  </div>
+                  <button class="toolbar-pill-btn is-prominent" type="button" id="review-count-btn">Review 7 items</button>
+                </div>
+
+                <!-- Safe to remove -->
+                <div class="suggestion-section-label">
+                  <svg class="suggestion-badge-icon is-safe" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 1.8 13 3.7v4c0 3.1-2.1 5.6-5 6.5-2.9-.9-5-3.4-5-6.5v-4L8 1.8z"/><path d="M5.6 8.1 7.2 9.7 10.6 6.3"/></svg>
+                  <span>Safe to remove</span>
+                </div>
+
+                <div class="inset-group">
+                  <div class="suggestion-group-item" data-group="build">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-build">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9.5 3.5 3 3-6.5 6.5-3-3L9.5 3.5z"/><path d="M11 2l3 3"/></svg>
+                        <span class="suggestion-name">Project build folders</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="build">1 selected</span>
+                        <span class="suggestion-size">uses 2.15 GB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-build" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="build" checked>
+                          <span>
+                            <span class="suggestion-child-title">Xcode DerivedData &amp; SwiftPM build outputs</span>
+                            <span class="suggestion-child-desc">Recreated automatically on your next build. Moves to Trash.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">2.15 GB</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="suggestion-group-item" data-group="pkg">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-pkg">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2 13.5 5v6L8 14 2.5 11V5L8 2z"/><path d="M2.5 5 8 8l5.5-3M8 8v6"/></svg>
+                        <span class="suggestion-name">Package manager caches</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="pkg">2 selected</span>
+                        <span class="suggestion-size">uses 2.01 GB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-pkg" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="pkg" checked>
+                          <span>
+                            <span class="suggestion-child-title">Homebrew download cache</span>
+                            <span class="suggestion-child-desc">Cached bottles already installed on this Mac.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">1.24 GB</span>
+                      </label>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="pkg" checked>
+                          <span>
+                            <span class="suggestion-child-title">npm &amp; pip package caches</span>
+                            <span class="suggestion-child-desc">Re-downloaded automatically if needed later.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">770 MB</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="suggestion-group-item" data-group="logs">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-logs">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 2.5h5.5L12.5 5.5v8H4v-11z"/><path d="M6 8h4M6 10.5h3"/></svg>
+                        <span class="suggestion-name">Logs and diagnostic reports</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="logs">2 selected</span>
+                        <span class="suggestion-size">uses 1.9 GB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-logs" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="logs" checked>
+                          <span>
+                            <span class="suggestion-child-title">User application logs</span>
+                            <span class="suggestion-child-desc">Historical app log files in ~/Library/Logs.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">1.32 GB</span>
+                      </label>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="logs" checked>
+                          <span>
+                            <span class="suggestion-child-title">Crash &amp; diagnostic reports</span>
+                            <span class="suggestion-child-desc">Archived crash logs no longer needed for troubleshooting.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">580 MB</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="suggestion-group-item" data-group="safe-caches">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-safe-caches">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="11" height="8" rx="1.8"/><path d="M2.5 9h11"/></svg>
+                        <span class="suggestion-name">App caches</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="safe-caches">1 selected</span>
+                        <span class="suggestion-size">uses 43.9 MB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-safe-caches" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="safe-caches" checked>
+                          <span>
+                            <span class="suggestion-child-title">Browser update &amp; code-sign clones</span>
+                            <span class="suggestion-child-desc">Stale staging copies left after browser updates.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">43.9 MB</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="suggestion-group-item" data-group="xcode-caches">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-xcode-caches">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="11" height="8" rx="1.8"/><path d="M6 8h4"/></svg>
+                        <span class="suggestion-name">Xcode caches</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="xcode-caches">1 selected</span>
+                        <span class="suggestion-size">uses 4.1 MB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-xcode-caches" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="xcode-caches" checked>
+                          <span>
+                            <span class="suggestion-child-title">Xcode documentation &amp; preview caches</span>
+                            <span class="suggestion-child-desc">Rebuilt automatically the next time Xcode opens.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">4.1 MB</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Review first -->
+                <div class="suggestion-section-label">
+                  <svg class="suggestion-badge-icon is-review" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.2 14 13H2L8 2.2z"/><path d="M8 6.4v3M8 11.3h.01"/></svg>
+                  <span>Review first</span>
+                </div>
+
+                <div class="inset-group">
+                  <div class="suggestion-group-item" data-group="simulators">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-simulators">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4.5" y="2" width="7" height="12" rx="1.4"/><path d="M7 11.8h2"/></svg>
+                        <span class="suggestion-name">iOS and other Apple simulators</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="simulators"></span>
+                        <span class="suggestion-size">uses 67.46 GB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-simulators" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="simulators">
+                          <span>
+                            <span class="suggestion-child-title">Installed iOS &amp; watchOS simulator runtimes</span>
+                            <span class="suggestion-child-desc">Remove old runtimes via xcrun simctl if you no longer target them.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">67.46 GB</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="suggestion-group-item" data-group="review-caches">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-review-caches">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="11" height="8" rx="1.8"/><path d="M2.5 9h11"/></svg>
+                        <span class="suggestion-name">App caches</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="review-caches"></span>
+                        <span class="suggestion-size">uses 9.61 GB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-review-caches" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="review-caches">
+                          <span>
+                            <span class="suggestion-child-title">Large media &amp; offline app caches</span>
+                            <span class="suggestion-child-desc">Apps rebuild these on next launch, though offline playlists re-download.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">9.61 GB</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="suggestion-group-item" data-group="temp">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-temp">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.2"/></svg>
+                        <span class="suggestion-name">Temporary files and caches</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="temp"></span>
+                        <span class="suggestion-size">uses at least 4.34 GB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-temp" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="temp">
+                          <span>
+                            <span class="suggestion-child-title">User &amp; /var/folders temporary items</span>
+                            <span class="suggestion-child-desc">Active apps may hold open handles; review before moving to Trash.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">4.34 GB</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <div class="suggestion-group-item" data-group="downloads">
+                    <button class="suggestion-toggle" type="button" aria-expanded="false" aria-controls="sg-downloads">
+                      <span class="suggestion-toggle-left">
+                        <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                        <svg class="suggestion-glyph" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2.5v7.5m0 0-3-3m3 3 3-3M3 13h10"/></svg>
+                        <span class="suggestion-name">Downloads</span>
+                      </span>
+                      <span class="suggestion-toggle-right">
+                        <span class="suggestion-selected" data-group-count="downloads"></span>
+                        <span class="suggestion-size">uses 128.5 MB</span>
+                      </span>
+                    </button>
+                    <div class="suggestion-panel" id="sg-downloads" hidden>
+                      <label class="suggestion-child">
+                        <span class="suggestion-child-left">
+                          <input class="app-checkbox suggestion-check" type="checkbox" data-group="downloads">
+                          <span>
+                            <span class="suggestion-child-title">Old disk images &amp; installer packages</span>
+                            <span class="suggestion-child-desc">Already-installed .dmg and .pkg files in ~/Downloads.</span>
+                          </span>
+                        </span>
+                        <span class="suggestion-child-size">128.5 MB</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="coverage-bar-card">
+                  <svg class="suggestion-chevron" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 2.5 8 6l-3.5 3.5"/></svg>
+                  <div>
+                    <strong>11.23 GB isn’t accounted for</strong>
+                    <span>Scan coverage and disk details</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View 2: ScanComparisonView.swift -->
+              <div class="macos-page" role="tabpanel" id="view-changed" aria-labelledby="nav-changed">
+                <div class="app-page-header">
+                  <div class="app-header-left">
+                    <span class="symbol-tile tint-purple" aria-hidden="true">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 16V4m0 0L3.5 7M6.5 4l3 3M13.5 4v12m0 0-3-3m3 3 3-3"/></svg>
+                    </span>
+                    <div>
+                      <div class="app-page-title">What changed?</div>
+                      <div class="app-page-subtitle">Compare how much space your folders and known storage locations used at different times.</div>
+                    </div>
+                  </div>
+                  <div class="app-header-actions">
+                    <button class="toolbar-pill-btn" type="button" data-jump-tab="nav-overview">Back to Overview</button>
+                  </div>
+                </div>
+
+                <div class="app-card">
+                  <div class="gauge-footnote">
+                    <strong>2.1 MB less free</strong><br>
+                    Measured from watched-folder checks without requiring a full startup-disk rescan.
+                  </div>
+                </div>
+
+                <div class="inset-group">
+                  <div class="inset-row">
+                    <div class="inset-row-left">
+                      <div>
+                        <div class="inset-row-title-line">
+                          <span class="inset-row-title">~/Projects/Footage</span>
+                          <span class="inset-row-bucket">Watched folder · automatic file-event check</span>
+                        </div>
+                        <div class="inset-row-desc">Exports/clip.mov appended between checks · files remain untouched until reviewed</div>
+                      </div>
+                    </div>
+                    <div class="inset-row-right">
+                      <div class="inset-row-size">+2.1 MB</div>
+                      <div class="inset-row-sub">4 KB → 2.1 MB</div>
+                    </div>
+                  </div>
+                  <div class="inset-row">
+                    <div class="inset-row-left">
+                      <div>
+                        <div class="inset-row-title-line">
+                          <span class="inset-row-title">Coverage verification</span>
+                          <span class="inset-row-verdict">Transparent</span>
+                        </div>
+                        <div class="inset-row-desc">If a folder becomes unreadable between scans, Andromeda flags the gap explicitly instead of showing stale totals.</div>
+                      </div>
+                    </div>
+                    <div class="inset-row-right">
+                      <button class="toolbar-pill-btn is-prominent" type="button" id="space-plan-toggle">Add to Space Plan</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View 3: DuplicatesView.swift -->
+              <div class="macos-page" role="tabpanel" id="view-duplicates" aria-labelledby="nav-duplicates">
+                <div class="app-page-header">
+                  <div class="app-header-left">
+                    <span class="symbol-tile tint-purple" aria-hidden="true">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="3" width="9" height="11" rx="2"/><path d="M7.5 14v1.5A1.5 1.5 0 0 0 9 17h6.5a1.5 1.5 0 0 0 1.5-1.5V7A1.5 1.5 0 0 0 15.5 5.5H12"/></svg>
+                    </span>
+                    <div>
+                      <div class="app-page-title">Duplicates</div>
+                      <div class="app-page-subtitle">Compare folders across your Mac and connected drives for exact byte-for-byte matches.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="inset-group">
+                  <div class="inset-row">
+                    <div class="inset-row-left">
+                      <div>
+                        <div class="inset-row-title-line">
+                          <span class="inset-row-title">manifest.txt</span>
+                          <span class="inset-row-verdict is-neutral">Keep original</span>
+                        </div>
+                        <div class="inset-row-desc">~/Projects/Release/manifest.txt</div>
+                      </div>
+                    </div>
+                    <div class="inset-row-right">
+                      <div class="inset-row-size">512 B</div>
+                    </div>
+                  </div>
+                  <div class="inset-row">
+                    <div class="inset-row-left">
+                      <div>
+                        <div class="inset-row-title-line">
+                          <span class="inset-row-title">manifest-copy.txt</span>
+                          <span class="inset-row-verdict">Exact match · Move to Trash</span>
+                        </div>
+                        <div class="inset-row-desc">Rechecked byte-for-byte before moving · Put back from History anytime</div>
+                      </div>
+                    </div>
+                    <div class="inset-row-right">
+                      <div class="inset-row-size">512 B</div>
+                    </div>
+                  </div>
+                  <div class="inset-row">
+                    <div class="inset-row-left">
+                      <div>
+                        <div class="inset-row-title-line">
+                          <span class="inset-row-title">manifest-draft.txt</span>
+                          <span class="inset-row-verdict is-neutral">Excluded</span>
+                        </div>
+                        <div class="inset-row-desc">Same file size, differs by 1 byte — never marked as a duplicate</div>
+                      </div>
+                    </div>
+                    <div class="inset-row-right">
+                      <div class="inset-row-size">512 B</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View 4: DriveCatalogView.swift -->
+              <div class="macos-page" role="tabpanel" id="view-catalogs" aria-labelledby="nav-catalogs">
+                <div class="app-page-header">
+                  <div class="app-header-left">
+                    <span class="symbol-tile tint-teal" aria-hidden="true">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="2.5" y="5.5" width="15" height="9" rx="2.5"/><circle cx="14" cy="10" r="1" fill="currentColor"/></svg>
+                    </span>
+                    <div>
+                      <div class="app-page-title">Drive Catalogs</div>
+                      <div class="app-page-subtitle">Find files and folders on drives you’ve cataloged, even when they’re unplugged.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="inset-group">
+                  <div class="inset-row">
+                    <div class="inset-row-left">
+                      <div>
+                        <div class="inset-row-title-line">
+                          <span class="inset-row-title">Landscape-UHD.mp4</span>
+                          <span class="inset-row-verdict">Saved 4K frame</span>
+                          <span class="inset-row-bucket">Studio-SSD-04 (Offline · Shelf B)</span>
+                        </div>
+                        <div class="inset-row-desc">Matched by 4K or higher filter · frame preview and codec details stored locally on this Mac</div>
+                      </div>
+                    </div>
+                    <div class="inset-row-right">
+                      <div class="inset-row-size">3840 × 2160</div>
+                      <div class="inset-row-sub">60 fps · ProRes</div>
+                    </div>
+                  </div>
+                  <div class="inset-row">
+                    <div class="inset-row-left">
+                      <div>
+                        <div class="inset-row-title-line">
+                          <span class="inset-row-title">Portrait-UHD.mp4</span>
+                          <span class="inset-row-verdict">Saved 4K frame</span>
+                          <span class="inset-row-bucket">Studio-SSD-04 (Offline · Shelf B)</span>
+                        </div>
+                        <div class="inset-row-desc">Vertical UHD clip recognized by resolution filter · ready to reveal on reconnect</div>
+                      </div>
+                    </div>
+                    <div class="inset-row-right">
+                      <div class="inset-row-size">2160 × 3840</div>
+                      <div class="inset-row-sub">50 fps · H.265</div>
+                    </div>
+                  </div>
+                  <div class="inset-row">
+                    <div class="inset-row-left">
+                      <div>
+                        <div class="inset-row-title-line">
+                          <span class="inset-row-title">Andromeda Checksums.sha256</span>
+                          <span class="inset-row-verdict">Verified archive</span>
+                        </div>
+                        <div class="inset-row-desc">Portable SHA-256 manifest beside every archived project — refuses corrupt restores</div>
+                      </div>
+                    </div>
+                    <div class="inset-row-right">
+                      <div class="inset-row-size">SHA-256</div>
+                      <div class="inset-row-sub">0 changed bytes</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- View 5: OrganizeFolderView.swift -->
+              <div class="macos-page" role="tabpanel" id="view-organize" aria-labelledby="nav-organize">
+                <div class="app-page-header">
+                  <div class="app-header-left">
+                    <span class="symbol-tile tint-indigo" aria-hidden="true">
+                      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M2.5 5.5A2 2 0 0 1 4.5 3.5h3.5l1.6 2h5.9a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2v-9z"/></svg>
+                    </span>
+                    <div>
+                      <div class="app-page-title">Organize a folder</div>
+                      <div class="app-page-subtitle">Sorts one folder’s files by kind and date, by their names and details only. Nothing moves until you apply the plan.</div>
+                    </div>
+                  </div>
+                  <div class="app-header-actions">
+                    <button class="toolbar-pill-btn is-prominent" type="button" id="apply-preview-btn">Apply plan</button>
+                  </div>
+                </div>
+
+                <div class="stat-tile-grid">
+                  <div class="app-stat-tile"><strong>13</strong><span>folders to create</span></div>
+                  <div class="app-stat-tile"><strong>30</strong><span>files to move</span></div>
+                  <div class="app-stat-tile"><strong>8</strong><span>files to rename</span></div>
+                  <div class="app-stat-tile"><strong>0</strong><span>files deleted</span></div>
+                </div>
+
+                <div class="organize-split">
+                  <div class="inset-group">
+                    <div class="organize-col-title">Now · Downloads</div>
+                    <div class="inset-row">
+                      <div>
+                        <div class="inset-row-title">Bank statement 2026-04.pdf</div>
+                        <div class="inset-row-desc">→ Documents/Bank statement 2026-04.pdf</div>
+                      </div>
+                      <div class="inset-row-size">184 KB</div>
+                    </div>
+                    <div class="inset-row">
+                      <div>
+                        <div class="inset-row-title">CV final-final.docx</div>
+                        <div class="inset-row-desc">→ Documents/CV.docx (tidies suffix)</div>
+                      </div>
+                      <div class="inset-row-size">184 KB</div>
+                    </div>
+                  </div>
+                  <div class="inset-group">
+                    <div class="organize-col-title">Proposed · Reversible by group</div>
+                    <div class="inset-row">
+                      <div>
+                        <div class="inset-row-title">Documents · 7 files</div>
+                        <div class="inset-row-desc">Images/2026 · 6 files · Spreadsheets · 2 files</div>
+                      </div>
+                      <div class="inset-row-verdict">Undoable</div>
+                    </div>
+                    <div class="inset-row">
+                      <div>
+                        <div class="inset-row-title">Left alone</div>
+                        <div class="inset-row-desc">Code projects, active downloads, your own folders</div>
+                      </div>
+                      <div class="inset-row-verdict is-neutral">Protected</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+              </div><!-- /.macbook-desktop -->
+            </div><!-- /.macbook-screen -->
+            <div class="macbook-chin" aria-hidden="true"></div>
+          </div><!-- /.macbook-lid -->
+
+          <!-- Space Black MacBook Pro Aluminum Deck, Recessed Thumb Cutout & Feet -->
+          <div class="macbook-base" aria-hidden="true">
+            <div class="macbook-base-top">
+              <div class="macbook-thumb-notch"></div>
+            </div>
+            <div class="macbook-base-bottom"></div>
+          </div>
+          <div class="macbook-feet" aria-hidden="true">
+            <span></span>
+            <span></span>
+          </div>
+          <div class="macbook-shadow" aria-hidden="true"></div>
+        </div><!-- /.macbook-stage -->
+
+        <p class="preview-caption reveal">Click sidebar views or expand Cleanup suggestions directly on the MacBook screen — see how Andromeda maps your entire startup disk, including macOS-restricted areas.</p>
+      </div>
+    </section>
+
+    <!-- Chapter 2: Minimalist Clickable Capabilities Grid (Each Card Opens a Dedicated Guide Page) -->
+    <section class="chapter chapter-black" id="capabilities" aria-labelledby="capabilities-title">
+      <div class="frame">
+        <div class="cap-grid-header reveal">
+          <h2 class="section-heading" id="capabilities-title">Measure. Organise. <span class="accent-spectrum">Archive.</span></h2>
+          <p class="section-lede">Every tool is built for native macOS accuracy. Select any capability to read the full guide.</p>
+        </div>
+
+        <div class="cap-bento-grid">
+          <a class="cap-bento-card reveal" href="guide.html?topic=apfs-sizing">
+            <div class="cap-bento-head">
+              <h3>Precise APFS space calculation</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Separates reported allocation from private blocks actually freed, handling APFS clones and shared space honestly.</p>
+          </a>
+
+          <a class="cap-bento-card reveal reveal-d1" href="guide.html?topic=system-data">
+            <div class="cap-bento-head">
+              <h3>Expose “System Data”</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Breaks down macOS’s hidden System Data using a 41-item catalog of caches, simulators, backups, and AI models.</p>
+          </a>
+
+          <a class="cap-bento-card reveal" href="guide.html?topic=what-changed">
+            <div class="cap-bento-head">
+              <h3>What changed? &amp; Storage Trends</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Compare any two scans, chart free space over months, and catch silent folder growth automatically.</p>
+          </a>
+
+          <a class="cap-bento-card reveal reveal-d1" href="guide.html?topic=duplicates">
+            <div class="cap-bento-head">
+              <h3>Exact Duplicates &amp; Similar Images</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Byte-for-byte duplicate review across local and external drives, plus perceptual lookalikes and Apple Photos.</p>
+          </a>
+
+          <a class="cap-bento-card reveal" href="guide.html?topic=app-cleanup">
+            <div class="cap-bento-head">
+              <h3>App Cleanup &amp; Installer Finder</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Uninstall apps alongside scattered Library files, filter Intel-only or unused apps, and sweep old DMGs.</p>
+          </a>
+
+          <a class="cap-bento-card reveal reveal-d1" href="guide.html?topic=organize">
+            <div class="cap-bento-head">
+              <h3>Organize messy folders</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Sort folders by kind, EXIF date, or project with full preview and group-by-group undo — zero deletions.</p>
+          </a>
+
+          <a class="cap-bento-card reveal" href="guide.html?topic=automation">
+            <div class="cap-bento-head">
+              <h3>Automated rules &amp; on-device OCR</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">File documents automatically with nested All / Any / None rules and local text matching inside PDFs and images.</p>
+          </a>
+
+          <a class="cap-bento-card reveal reveal-d1" href="guide.html?topic=drive-catalogs">
+            <div class="cap-bento-head">
+              <h3>Offline Drive Catalogs</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Search unplugged external drives with previews, 4K+ codec filters, shelf notes, and cross-drive collections.</p>
+          </a>
+
+          <a class="cap-bento-card reveal" href="guide.html?topic=external-archives">
+            <div class="cap-bento-head">
+              <h3>Verified External Archives</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Offload projects to APFS disks with SHA-256 checksums, clone-backed versions, and 30-day integrity checks.</p>
+          </a>
+
+          <a class="cap-bento-card reveal reveal-d1" href="guide.html?topic=space-plan">
+            <div class="cap-bento-head">
+              <h3>Space Plan &amp; Cloud Offload</h3>
+              <svg class="cap-bento-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.5 11.5 11.5 4.5M6 4.5h5.5V10"/></svg>
+            </div>
+            <p class="cap-bento-desc">Combine cleanups, archives, and Move to Cloud receipts into one recovery goal while keeping essentials local.</p>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 3: Full-Viewport Scroll-Pinned Safety Showcase (Vertical Stack + 3 Images + Centered Steps) -->
+    <section class="safety-scroll-track" id="safety" aria-labelledby="safety-heading">
+      <div class="safety-sticky">
+        <div class="safety-ambient" id="safety-ambient" aria-hidden="true"></div>
+
+        <div class="safety-inner">
+          <div class="safety-text-col">
+            <p class="safety-kicker" id="safety-heading">Built for safety</p>
+
+            <div class="safety-words-stack" role="tablist" aria-label="Safety principles">
+              <button class="safety-word-btn is-active" type="button" role="tab" aria-selected="true" aria-controls="safety-panel-0" data-safety-index="0">
+                <span class="safety-word-sizer" aria-hidden="true">Reversible</span>
+                <span class="safety-word-base">Reversible</span>
+                <span class="safety-word-active" aria-hidden="true">Reversible</span>
+              </button>
+              <button class="safety-word-btn" type="button" role="tab" aria-selected="false" aria-controls="safety-panel-1" data-safety-index="1">
+                <span class="safety-word-sizer" aria-hidden="true">Offline</span>
+                <span class="safety-word-base">Offline</span>
+                <span class="safety-word-active" aria-hidden="true">Offline</span>
+              </button>
+              <button class="safety-word-btn" type="button" role="tab" aria-selected="false" aria-controls="safety-panel-2" data-safety-index="2">
+                <span class="safety-word-sizer" aria-hidden="true">Explicit</span>
+                <span class="safety-word-base">Explicit</span>
+                <span class="safety-word-active" aria-hidden="true">Explicit</span>
+              </button>
+            </div>
+
+            <div class="safety-copy-stage">
+              <div class="safety-panel is-active" id="safety-panel-0" role="tabpanel">
+                <p>Every file change is journaled before it happens. Ordinary cleanups move items to Trash, Organize runs undo a single group or the entire batch from History, and mid-run crash recovery restores every path and inode identically.</p>
+                <span class="safety-panel-note">Tested by force-quitting runs mid-flight across over 1,300 files</span>
+              </div>
+
+              <div class="safety-panel" id="safety-panel-1" role="tabpanel">
+                <p>Scanning, organizing, cataloging, and on-device OCR content matching run locally on your Mac. No accounts, no usage analytics, and no filenames or folder structures ever leave your machine.</p>
+                <span class="safety-panel-note">Zero telemetry · works completely offline</span>
+              </div>
+
+              <div class="safety-panel" id="safety-panel-2" role="tabpanel">
+                <p>Nothing moves, deletes, or changes silently. Every cleanup review, automation rule, archive copy, and system action shows the exact paths and coverage beforehand — and automatically leaves code projects, system libraries, and iCloud-synced folders untouched.</p>
+                <span class="safety-panel-note">Full review before apply · unreadable paths disclosed rather than guessed</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="safety-media-col">
+            <div class="safety-media-frame">
+              <figure class="safety-media-slide is-active" data-safety-media="0">
+                <img src="assets/safety-reversible.jpg" width="1200" height="900" alt="Reversible actions preview placeholder" referrerpolicy="no-referrer">
+                <figcaption class="safety-media-caption">
+                  <span>Journaled undo &amp; crash recovery</span>
+                  <span class="safety-media-index mono">01 / 03</span>
+                </figcaption>
+              </figure>
+
+              <figure class="safety-media-slide" data-safety-media="1">
+                <img src="assets/safety-offline.jpg" width="1200" height="900" alt="Offline local processing preview placeholder" referrerpolicy="no-referrer">
+                <figcaption class="safety-media-caption">
+                  <span>100% local on Apple silicon</span>
+                  <span class="safety-media-index mono">02 / 03</span>
+                </figcaption>
+              </figure>
+
+              <figure class="safety-media-slide" data-safety-media="2">
+                <img src="assets/safety-explicit.jpg" width="1200" height="900" alt="Explicit review before apply preview placeholder" referrerpolicy="no-referrer">
+                <figcaption class="safety-media-caption">
+                  <span>Preview every path before apply</span>
+                  <span class="safety-media-index mono">03 / 03</span>
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+
+        <div class="safety-steps" aria-label="Jump to safety principle">
+          <button class="safety-step-btn is-active" type="button" data-safety-index="0" aria-label="Reversible"></button>
+          <button class="safety-step-btn" type="button" data-safety-index="1" aria-label="Offline"></button>
+          <button class="safety-step-btn" type="button" data-safety-index="2" aria-label="Explicit"></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 4: FAQ -->
+    <section class="chapter chapter-canvas" id="faq" aria-labelledby="faq-title">
+      <div class="frame-narrow">
+        <div class="section-header reveal">
+          <h2 class="section-heading" id="faq-title"><span class="accent-spectrum">FAQ</span></h2>
+        </div>
+
+        <div class="faq-list reveal">
+          <div class="faq-item">
+            <button class="faq-trigger" type="button" aria-expanded="true" aria-controls="faq-1">
+              <span>Which Macs and macOS versions are supported?</span>
+              <svg class="faq-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7.5L10 12.5 15 7.5"/></svg>
+            </button>
+            <div class="faq-panel" id="faq-1">
+              Currently, Andromeda runs natively on Apple silicon Macs with macOS 26 or later and is distributed as a signed, notarized DMG. Support for additional macOS versions and Intel Macs will be added moving forward.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-trigger" type="button" aria-expanded="false" aria-controls="faq-2">
+              <span>Is Andromeda free to use?</span>
+              <svg class="faq-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7.5L10 12.5 15 7.5"/></svg>
+            </button>
+            <div class="faq-panel" id="faq-2" hidden>
+              Yes. Andromeda is free to download and use across all your Macs with every feature included — no subscriptions, no license keys, and no locked tools. Optional donations are welcome on the download page if you’d like to support ongoing development.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-trigger" type="button" aria-expanded="false" aria-controls="faq-3">
+              <span>Do I have to grant Full Disk Access to use Andromeda?</span>
+              <svg class="faq-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7.5L10 12.5 15 7.5"/></svg>
+            </button>
+            <div class="faq-panel" id="faq-3" hidden>
+              No. You can scan with limited access on first launch or grant Full Disk Access in System Settings so Andromeda can measure protected locations. Either way, any unreadable path is reported transparently rather than guessed.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-trigger" type="button" aria-expanded="false" aria-controls="faq-4">
+              <span>Will Organize ever delete files or touch my code projects?</span>
+              <svg class="faq-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7.5L10 12.5 15 7.5"/></svg>
+            </button>
+            <div class="faq-panel" id="faq-4" hidden>
+              No. Organize never deletes files and automatically leaves code projects, packages, app libraries, symlinks, <code>~/Library</code>, and iCloud-synced Desktop or Documents untouched. Every move is previewed first and can be undone per group or for the entire run.
+            </div>
+          </div>
+
+          <div class="faq-item">
+            <button class="faq-trigger" type="button" aria-expanded="false" aria-controls="faq-5">
+              <span>Does Andromeda send file names or usage analytics off my Mac?</span>
+              <svg class="faq-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7.5L10 12.5 15 7.5"/></svg>
+            </button>
+            <div class="faq-panel" id="faq-5" hidden>
+              Never. Scanning, organizing, cataloging, and archiving run locally on your Mac. There are no analytics or telemetry.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Chapter 6: Andromeda Blue-to-Purple Closing Field & Bottom-Anchored Footer -->
+    <div class="closing-field">
+      <section class="closing-cta reveal" aria-labelledby="closing-title">
+        <h2 class="section-heading" id="closing-title">Ready to see what’s really using your Mac?</h2>
+        <div class="hero-actions">
+          <a class="btn-primary" href="download.html">Download now</a>
+        </div>
+        <p class="hero-reassurance">Free download · Optional donations · Apple silicon · macOS 26 or later</p>
+      </section>
+
+      <footer class="frame-footer">
+        <div class="footer-plate">
+          <div class="footer-grid">
+            <div class="footer-identity">
+              <a class="brand" href="./">
+                <img src="assets/icon.png" width="34" height="34" alt="">
+                <span>Andromeda</span>
+              </a>
+              <p class="footer-summary">Storage, explained. Measure what fills your Mac, track what changed, and tidy folders or archive drives with reversible plans.</p>
+              <svg class="svg-defs-hidden" width="0" height="0" aria-hidden="true">
+                <defs>
+                  <linearGradient id="andromeda-brand-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4f9eff"/>
+                    <stop offset="56%" stop-color="#968aea"/>
+                    <stop offset="100%" stop-color="#c9c2ff"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="footer-social" aria-label="Social media">
+                <a class="footer-social-link" href="https://linkedin.com" target="_blank" rel="noopener noreferrer" aria-label="Andromeda on LinkedIn" title="LinkedIn">
+                  <svg class="is-fill" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/></svg>
+                </a>
+                <a class="footer-social-link" href="https://facebook.com" target="_blank" rel="noopener noreferrer" aria-label="Andromeda on Facebook" title="Facebook">
+                  <svg class="is-fill" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z"/></svg>
+                </a>
+                <a class="footer-social-link" href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="Andromeda on X" title="X">
+                  <svg class="is-fill" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                </a>
+                <a class="footer-social-link" href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Andromeda on Instagram" title="Instagram">
+                  <svg class="is-stroke" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle class="ig-dot" cx="17.5" cy="6.5" r="0.9" fill="currentColor" stroke="none"/></svg>
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="footer-col-title">Product</h3>
+              <ul class="footer-list">
+                <li><a href="#preview">Interface preview</a></li>
+                <li><a href="#capabilities">Capabilities</a></li>
+                <li><a href="#safety">Safety</a></li>
+                <li><a href="guide.html">Guide</a></li>
+                <li><a href="#faq">FAQ</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h3 class="footer-col-title">Download &amp; Legal</h3>
+              <ul class="footer-list">
+                <li><a href="download.html">Download &amp; Donate</a></li>
+                <li><button class="footer-link-btn" type="button" data-legal-open="privacy">Privacy Policy</button></li>
+                <li><button class="footer-link-btn" type="button" data-legal-open="terms">Terms &amp; Conditions</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   </main>
+
+  <!-- Legal Modal (Privacy Policy & Terms & Conditions) -->
+  <div class="modal-backdrop" id="legal-modal" hidden role="dialog" aria-modal="true" aria-labelledby="legal-modal-title">
+    <div class="modal-sheet">
+      <div class="modal-head">
+        <div>
+          <div class="tier-kicker" id="legal-modal-kicker">Andromeda Legal</div>
+          <h2 class="modal-title" id="legal-modal-title">Privacy Policy</h2>
+        </div>
+        <button class="modal-close" type="button" id="legal-modal-close" aria-label="Close">✕</button>
+      </div>
+      <div id="legal-modal-body" class="modal-note"></div>
+      <button class="btn-primary" type="button" id="legal-modal-done">Close</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reducedMotion) {
+        document.documentElement.classList.add('js-motion');
+      }
+
+      const isCompactViewport = () => window.matchMedia('(max-width: 900px)').matches || window.matchMedia('(max-height: 560px)').matches;
+      const isShortLandscape = () => window.matchMedia('(max-height: 540px) and (orientation: landscape)').matches;
+      const smoothstep = (t) => {
+        const c = Math.max(0, Math.min(1, t));
+        return c * c * (3 - 2 * c);
+      };
+
+      /* =====================================================================
+         1. Lifelike 3D Andromeda Galaxy Canvas Engine
+            - Spins continuously on its TRUE galactic polar axis (differential)
+            - Scroll rotates inclination from M31's 68° tilt to 0° perpendicular
+            - Smoothly coalesces into the Andromeda Core & Spiral Arms SVG mark
+         ===================================================================== */
+      const galaxyCanvas = document.getElementById('galaxy-canvas');
+      const galaxyLogoMark = document.getElementById('galaxy-logo-mark');
+      const galaxyCoreHalo = document.getElementById('galaxy-core-halo');
+      const galaxyNebula = document.getElementById('galaxy-nebula');
+      const heroTrack = document.getElementById('hero-track');
+      const heroTopEl = document.getElementById('hero-top');
+      const heroBottomEl = document.getElementById('hero-bottom');
+      const heroScrollFill = document.getElementById('hero-scroll-fill');
+
+      let heroProgress = 0;
+      let heroVisible = true;
+      let galaxyRaf = 0;
+      let ambientAngle = 0;
+      let lastFrameTime = performance.now();
+
+      function createGlowSprite(stops) {
+        const size = 64;
+        const c = document.createElement('canvas');
+        c.width = size;
+        c.height = size;
+        const g = c.getContext('2d');
+        const grad = g.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+        stops.forEach(([pos, col]) => grad.addColorStop(pos, col));
+        g.fillStyle = grad;
+        g.fillRect(0, 0, size, size);
+        return c;
+      }
+
+      // Deterministic PRNG for consistent, rich starfield across reloads
+      let seed = 3102026;
+      function rand() {
+        seed = (seed * 1664525 + 1013904223) >>> 0;
+        return seed / 4294967296;
+      }
+      function gauss() {
+        const u = Math.max(1e-6, rand());
+        const v = rand();
+        return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+      }
+
+      const sprites = {
+        ivory: createGlowSprite([[0, 'rgba(255,248,232,1)'], [0.3, 'rgba(255,232,196,0.58)'], [0.65, 'rgba(196,184,255,0.16)'], [1, 'rgba(196,184,255,0)']]),
+        lavender: createGlowSprite([[0, 'rgba(222,216,255,0.95)'], [0.35, 'rgba(150,138,234,0.52)'], [0.7, 'rgba(85,77,150,0.14)'], [1, 'rgba(85,77,150,0)']]),
+        blue: createGlowSprite([[0, 'rgba(182,222,255,0.96)'], [0.32, 'rgba(79,158,255,0.58)'], [0.7, 'rgba(79,158,255,0.12)'], [1, 'rgba(79,158,255,0)']]),
+        rose: createGlowSprite([[0, 'rgba(240,196,255,0.9)'], [0.38, 'rgba(170,122,238,0.4)'], [1, 'rgba(120,82,200,0)']]),
+        star: createGlowSprite([[0, 'rgba(255,255,255,1)'], [0.28, 'rgba(218,228,255,0.68)'], [1, 'rgba(120,160,255,0)']])
+      };
+
+      // Build 3D Andromeda M31 particle + volumetric nebula dataset
+      // Rigid density-wave spiral pattern: arms wind counter-clockwise outward (-r * 3.7)
+      // matching the Andromeda logo chirality, and rotate clockwise (+theta) so arms trail naturally
+      // and retain their exact spiral structure indefinitely.
+      const nebulaClouds = [];
+      const stars = [];
+
+      // 150 volumetric glowing nebula clouds along the two primary arms + warm core
+      for (let i = 0; i < 150; i++) {
+        const isBulge = i < 34;
+        if (isBulge) {
+          const r = Math.pow(rand(), 1.65) * 0.24;
+          const a = rand() * Math.PI * 2;
+          nebulaClouds.push({
+            r,
+            a,
+            z: gauss() * 0.048 * (1 - r * 2),
+            size: 24 + rand() * 36,
+            alpha: 0.09 + rand() * 0.09,
+            sprite: r < 0.13 ? sprites.ivory : sprites.lavender,
+            speed: 1
+          });
+        } else {
+          const arm = i % 2;
+          const t = Math.pow(rand(), 0.88);
+          const r = 0.14 + t * 0.68;
+          const a = arm * Math.PI - r * 3.7 + gauss() * (0.2 + r * 0.12);
+          nebulaClouds.push({
+            r,
+            a,
+            z: gauss() * 0.024 * Math.exp(-r * 1.4),
+            size: 18 + rand() * 32,
+            alpha: (0.055 + rand() * 0.065) * (1.12 - t * 0.48),
+            sprite: r < 0.42 ? sprites.lavender : (rand() < 0.72 ? sprites.blue : sprites.rose),
+            speed: 1
+          });
+        }
+      }
+
+      // 1,850 luminous stars (galactic bulge + twin trailing spiral arms + M110 + ambient halo)
+      for (let i = 0; i < 1850; i++) {
+        const roll = rand();
+        if (roll < 0.22) {
+          // Warm dense galactic bulge (3D oblate spheroid)
+          const r = Math.pow(rand(), 1.9) * 0.28;
+          const a = rand() * Math.PI * 2;
+          stars.push({
+            r,
+            a,
+            z: gauss() * 0.058 * Math.exp(-r * 3.2),
+            size: 1.3 + rand() * 2.5,
+            alpha: 0.44 + rand() * 0.52,
+            sprite: r < 0.16 ? sprites.ivory : sprites.lavender,
+            speed: 1,
+            twinkle: rand() * Math.PI * 2
+          });
+        } else if (roll < 0.89) {
+          // Twin logarithmic trailing spiral arms (with crisp density-wave structure)
+          const arm = i % 2;
+          const spur = rand() < 0.16 ? -0.44 : 0;
+          const t = Math.pow(rand(), 0.82);
+          const r = 0.11 + t * 0.74;
+          const spread = 0.15 + r * 0.19;
+          const a = arm * Math.PI + spur - r * 3.74 + gauss() * spread;
+          const sprite = r < 0.34
+            ? (rand() < 0.55 ? sprites.ivory : sprites.lavender)
+            : (rand() < 0.64 ? sprites.blue : (rand() < 0.72 ? sprites.lavender : sprites.star));
+          stars.push({
+            r,
+            a,
+            z: gauss() * 0.02 * Math.exp(-r * 1.2),
+            size: 1.0 + Math.pow(rand(), 2.2) * 3.0,
+            alpha: (0.34 + rand() * 0.62) * (1.06 - t * 0.36),
+            sprite,
+            speed: 1,
+            twinkle: rand() * Math.PI * 2
+          });
+        } else if (roll < 0.93) {
+          // Subtle M110 companion dwarf glow (orbits softly with the galaxy frame)
+          const dr = Math.pow(rand(), 1.7) * 0.09;
+          const da = rand() * Math.PI * 2;
+          const cx = 0.48 + Math.cos(da) * dr;
+          const cy = -0.3 + Math.sin(da) * dr * 0.7;
+          stars.push({
+            r: Math.hypot(cx, cy),
+            a: Math.atan2(cy, cx),
+            z: 0.1 + gauss() * 0.018,
+            size: 1.2 + rand() * 2.0,
+            alpha: 0.28 + rand() * 0.4,
+            sprite: sprites.lavender,
+            speed: 1,
+            twinkle: rand() * Math.PI * 2
+          });
+        } else {
+          // Outer halo field stars (kept comfortably inside viewport and fade to 0 with galaxy)
+          const r = 0.32 + rand() * 0.56;
+          const a = rand() * Math.PI * 2;
+          stars.push({
+            r,
+            a,
+            z: (rand() - 0.5) * 0.35,
+            size: 0.85 + rand() * 1.8,
+            alpha: 0.2 + rand() * 0.48,
+            sprite: rand() < 0.5 ? sprites.star : sprites.blue,
+            speed: 0.12,
+            twinkle: rand() * Math.PI * 2
+          });
+        }
+      }
+
+      let canvasW = 0;
+      let canvasH = 0;
+      let canvasCtx = null;
+
+      function resizeGalaxyCanvas() {
+        if (!galaxyCanvas) return;
+        const rect = galaxyCanvas.getBoundingClientRect();
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvasW = Math.max(1, Math.round(rect.width));
+        canvasH = Math.max(1, Math.round(rect.height));
+        galaxyCanvas.width = Math.round(canvasW * dpr);
+        galaxyCanvas.height = Math.round(canvasH * dpr);
+        canvasCtx = galaxyCanvas.getContext('2d');
+        if (canvasCtx) {
+          canvasCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+      }
+
+      function renderGalaxyFrame(now) {
+        if (!canvasCtx || canvasW <= 1) return;
+        const dt = Math.min(0.05, Math.max(0.001, (now - lastFrameTime) / 1000));
+        lastFrameTime = now;
+
+        // Uniform clockwise rotation around the galaxy's true polar axis (arms trail behind)
+        if (!reducedMotion) {
+          ambientAngle += dt * 0.22;
+        }
+
+        const hp = reducedMotion ? 0 : heroProgress;
+        // Phase 1 (hp 0.00 -> 0.42): Rotate inclination from 68° oblique tilt -> 0° perpendicular face-on
+        const tiltPhase = smoothstep(hp / 0.42);
+        // Phase 1B (hp 0.00 -> 0.46): Hero headline and bottom copy start closer in, gliding apart to resting positions
+        const apartPhase = smoothstep(hp / 0.46);
+        // Phase 2 (hp 0.36 -> 0.62): Galaxy fades COMPLETELY to 0.0 so zero residue remains
+        const galaxyFadeOut = smoothstep((hp - 0.36) / 0.26);
+        // Phase 2B (hp 0.38 -> 0.62): Andromeda core & spiral arms SVG mark rises cleanly to 1.0
+        const logoFadeIn = smoothstep((hp - 0.38) / 0.24);
+        // Phase 3 (hp 0.40 -> 0.94): Logo performs a full 225° clockwise rotation (+180° beyond original) before scroll releases
+        const logoSpinPhase = smoothstep((hp - 0.40) / 0.54);
+
+        const tiltX = (1 - tiltPhase) * (68 * Math.PI / 180);
+        const rollZ = (1 - tiltPhase) * (-26 * Math.PI / 180);
+        const scrollSpin = hp * 2.1;
+        const totalSpin = ambientAngle + scrollSpin;
+
+        const cosTilt = Math.cos(tiltX);
+        const sinTilt = Math.sin(tiltX);
+        const cosRoll = Math.cos(rollZ);
+        const sinRoll = Math.sin(rollZ);
+
+        const cx = canvasW * 0.5;
+        const cy = canvasH * 0.5;
+        // Conservative projection radius ensures spiral arm tips and glow sprites never clip canvas edges
+        const baseRadius = Math.min(canvasW, canvasH) * 0.38 * (1.06 - tiltPhase * 0.1 - galaxyFadeOut * 0.1);
+        const camZ = 4.4;
+
+        canvasCtx.clearRect(0, 0, canvasW, canvasH);
+        const galaxyAlpha = Math.max(0, 1 - galaxyFadeOut);
+
+        if (galaxyAlpha > 0.004) {
+          canvasCtx.globalCompositeOperation = 'lighter';
+
+          // 1. Draw volumetric nebula clouds
+          for (let i = 0; i < nebulaClouds.length; i++) {
+            const p = nebulaClouds[i];
+            const theta = p.a + totalSpin * p.speed;
+            const gx = Math.cos(theta) * p.r;
+            const gy = Math.sin(theta) * p.r;
+            const gz = p.z;
+
+            // Pitch around X-axis (galaxy inclination -> perpendicular)
+            const y1 = gy * cosTilt - gz * sinTilt;
+            const z1 = gy * sinTilt + gz * cosTilt;
+            // Roll around Z-axis (M31 sky angle)
+            const x2 = gx * cosRoll - y1 * sinRoll;
+            const y2 = gx * sinRoll + y1 * cosRoll;
+
+            const persp = camZ / (camZ - z1);
+            const sx = cx + x2 * baseRadius * persp;
+            const sy = cy + y2 * baseRadius * persp;
+            const drawSize = p.size * persp * (baseRadius / 180);
+
+            canvasCtx.globalAlpha = Math.min(1, p.alpha * galaxyAlpha * (0.74 + persp * 0.26));
+            canvasCtx.drawImage(p.sprite, sx - drawSize * 0.5, sy - drawSize * 0.5, drawSize, drawSize);
+          }
+
+          // 2. Draw 3D stars with gentle twinkle (all fade completely to 0 with galaxyAlpha)
+          const twinkleT = now * 0.0022;
+          for (let i = 0; i < stars.length; i++) {
+            const p = stars[i];
+            const theta = p.a + totalSpin * p.speed;
+            const gx = Math.cos(theta) * p.r;
+            const gy = Math.sin(theta) * p.r;
+            const gz = p.z;
+
+            const y1 = gy * cosTilt - gz * sinTilt;
+            const z1 = gy * sinTilt + gz * cosTilt;
+            const x2 = gx * cosRoll - y1 * sinRoll;
+            const y2 = gx * sinRoll + y1 * cosRoll;
+
+            const persp = camZ / (camZ - z1);
+            const sx = cx + x2 * baseRadius * persp;
+            const sy = cy + y2 * baseRadius * persp;
+            const drawSize = p.size * (0.72 + persp * 0.42);
+            const shimmer = 0.86 + 0.14 * Math.sin(twinkleT + p.twinkle);
+
+            canvasCtx.globalAlpha = Math.min(1, p.alpha * shimmer * galaxyAlpha);
+            canvasCtx.drawImage(p.sprite, sx - drawSize, sy - drawSize, drawSize * 2, drawSize * 2);
+          }
+
+          // 3. Bright warm galactic nucleus glow (hands off cleanly to logo core)
+          const coreSize = baseRadius * 0.52;
+          canvasCtx.globalAlpha = 0.72 * galaxyAlpha;
+          canvasCtx.drawImage(sprites.ivory, cx - coreSize * 0.5, cy - coreSize * 0.5, coreSize, coreSize);
+
+          canvasCtx.globalCompositeOperation = 'source-over';
+          canvasCtx.globalAlpha = 1;
+        }
+
+        // 4. Sync the Andromeda Core & Spiral Arms SVG Logo Mark (+180° extra clockwise rotation)
+        if (galaxyLogoMark) {
+          const logoRot = -225 + logoSpinPhase * 225;
+          const logoScale = 0.86 + logoFadeIn * 0.14;
+          galaxyLogoMark.style.opacity = logoFadeIn.toFixed(3);
+          galaxyLogoMark.style.transform = 'rotate(' + logoRot.toFixed(2) + 'deg) scale(' + logoScale.toFixed(4) + ')';
+        }
+
+        // 5. Glide hero headline and bottom copy apart from closer initial framing to resting positions
+        if (heroTopEl && heroBottomEl) {
+          if (reducedMotion || isShortLandscape()) {
+            heroTopEl.style.transform = 'translate3d(0, 0, 0)';
+            heroBottomEl.style.transform = 'translate3d(0, 0, 0)';
+          } else {
+            const vh = window.innerHeight || 900;
+            const compactScale = window.matchMedia('(max-width: 640px)').matches ? 0.52 : 1;
+            const surplus = Math.max(0, vh - 500);
+            const maxTopShift = Math.min(112, Math.max(24, surplus * 0.275)) * compactScale;
+            const maxBottomShift = Math.min(108, Math.max(22, surplus * 0.265)) * compactScale;
+            const topOffset = (1 - apartPhase) * maxTopShift;
+            const bottomOffset = -(1 - apartPhase) * maxBottomShift;
+            heroTopEl.style.transform = 'translate3d(0, ' + topOffset.toFixed(2) + 'px, 0)';
+            heroBottomEl.style.transform = 'translate3d(0, ' + bottomOffset.toFixed(2) + 'px, 0)';
+          }
+        }
+
+        if (galaxyCoreHalo) {
+          const peakFlash = Math.sin(logoFadeIn * Math.PI);
+          const haloScale = 0.92 + tiltPhase * 0.1 + peakFlash * 0.24;
+          galaxyCoreHalo.style.transform = 'scale(' + haloScale.toFixed(4) + ')';
+          galaxyCoreHalo.style.opacity = Math.min(1, 0.44 + peakFlash * 0.34 + logoFadeIn * 0.12).toFixed(3);
+        }
+
+        if (galaxyNebula) {
+          galaxyNebula.style.transform = 'rotate(' + (hp * 18).toFixed(2) + 'deg) scale(' + (1 + hp * 0.07).toFixed(4) + ')';
+        }
+      }
+
+      function galaxyLoop(now) {
+        galaxyRaf = 0;
+        if (!heroVisible) return;
+        renderGalaxyFrame(now);
+        if (!reducedMotion) {
+          galaxyRaf = requestAnimationFrame(galaxyLoop);
+        }
+      }
+
+      function startGalaxyLoop() {
+        if (!galaxyRaf && heroVisible) {
+          lastFrameTime = performance.now();
+          galaxyRaf = requestAnimationFrame(galaxyLoop);
+        }
+      }
+
+      resizeGalaxyCanvas();
+      if ('IntersectionObserver' in window && heroTrack) {
+        const heroIO = new IntersectionObserver((entries) => {
+          heroVisible = entries[0].isIntersecting;
+          if (heroVisible) startGalaxyLoop();
+        }, { threshold: 0.01 });
+        heroIO.observe(heroTrack);
+      }
+      renderGalaxyFrame(performance.now());
+      if (!reducedMotion) startGalaxyLoop();
+
+      /* =====================================================================
+         2. Sticky Scroll Choreography: Hero Progress + Safety + Mobile Nav
+         ===================================================================== */
+      const progressBar = document.getElementById('scroll-progress');
+      const floatingNav = document.getElementById('floating-nav');
+      const navMenuBtn = document.getElementById('nav-menu-btn');
+      const mobileNavDrawer = document.getElementById('mobile-nav-drawer');
+
+      if (navMenuBtn && mobileNavDrawer) {
+        navMenuBtn.addEventListener('click', () => {
+          const open = navMenuBtn.getAttribute('aria-expanded') === 'true';
+          navMenuBtn.setAttribute('aria-expanded', String(!open));
+          mobileNavDrawer.hidden = open;
+        });
+        mobileNavDrawer.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => {
+            navMenuBtn.setAttribute('aria-expanded', 'false');
+            mobileNavDrawer.hidden = true;
+          });
+        });
+      }
+
+      const safetyTrack = document.getElementById('safety');
+      const safetyAmbient = document.getElementById('safety-ambient');
+      const safetyWords = Array.from(document.querySelectorAll('.safety-word-btn'));
+      const safetyPanels = Array.from(document.querySelectorAll('.safety-panel'));
+      const safetySteps = Array.from(document.querySelectorAll('.safety-step-btn'));
+      const safetyMediaSlides = Array.from(document.querySelectorAll('.safety-media-slide'));
+      const spaceBar = document.getElementById('space-bar-track');
+      let currentSafetyIdx = 0;
+
+      function setSafetyIndex(idx) {
+        const clamped = Math.max(0, Math.min(safetyWords.length - 1, idx));
+        if (clamped === currentSafetyIdx && safetyWords[clamped] && safetyWords[clamped].classList.contains('is-active')) {
+          return;
+        }
+        currentSafetyIdx = clamped;
+        safetyWords.forEach((btn, i) => {
+          const active = i === clamped;
+          btn.classList.toggle('is-active', active);
+          btn.setAttribute('aria-selected', String(active));
+        });
+        safetyPanels.forEach((panel, i) => {
+          panel.classList.toggle('is-active', i === clamped);
+          panel.classList.toggle('is-past', i < clamped);
+        });
+        safetySteps.forEach((step, i) => {
+          step.classList.toggle('is-active', i === clamped);
+        });
+        safetyMediaSlides.forEach((slide, i) => {
+          slide.classList.toggle('is-active', i === clamped);
+        });
+        if (safetyAmbient && !reducedMotion) {
+          const shiftY = (clamped - 1) * 8;
+          safetyAmbient.style.transform = 'translate3d(0, ' + shiftY + '%, 0)';
+        }
+      }
+
+      function scrollToSafetyStep(idx) {
+        if (!safetyTrack || reducedMotion || isCompactViewport()) {
+          setSafetyIndex(idx);
+          return;
+        }
+        const rect = safetyTrack.getBoundingClientRect();
+        const trackTop = window.scrollY + rect.top;
+        const maxTravel = Math.max(1, safetyTrack.offsetHeight - window.innerHeight);
+        const targetProgress = idx === 0 ? 0.1 : idx === 1 ? 0.5 : 0.9;
+        window.scrollTo({
+          top: trackTop + maxTravel * targetProgress,
+          behavior: 'smooth'
+        });
+      }
+
+      safetyWords.forEach((btn) => {
+        btn.addEventListener('click', () => scrollToSafetyStep(Number(btn.dataset.safetyIndex)));
+      });
+      safetySteps.forEach((btn) => {
+        btn.addEventListener('click', () => scrollToSafetyStep(Number(btn.dataset.safetyIndex)));
+      });
+
+      let ticking = false;
+      function onScrollFrame() {
+        ticking = false;
+        const y = window.scrollY || 0;
+        const vh = window.innerHeight || 1;
+        const maxScroll = Math.max(1, document.documentElement.scrollHeight - vh);
+
+        if (progressBar) {
+          progressBar.style.transform = 'scaleX(' + Math.min(1, Math.max(0, y / maxScroll)) + ')';
+        }
+        if (floatingNav) {
+          floatingNav.classList.toggle('is-scrolled', y > 24);
+        }
+
+        if (heroTrack) {
+          if (isShortLandscape()) {
+            heroProgress = 0;
+          } else {
+            const rect = heroTrack.getBoundingClientRect();
+            const heroTravel = Math.max(1, heroTrack.offsetHeight - vh);
+            heroProgress = Math.min(1, Math.max(0, -rect.top / heroTravel));
+          }
+
+          if (heroScrollFill) {
+            heroScrollFill.style.transform = 'scaleX(' + (0.08 + heroProgress * 0.92).toFixed(4) + ')';
+          }
+        }
+
+        if (!reducedMotion && !isCompactViewport() && safetyTrack) {
+          const sRect = safetyTrack.getBoundingClientRect();
+          const sTravel = Math.max(1, safetyTrack.offsetHeight - vh);
+          const sp = Math.min(1, Math.max(0, -sRect.top / sTravel));
+          const nextIdx = sp < 0.34 ? 0 : sp < 0.68 ? 1 : 2;
+          setSafetyIndex(nextIdx);
+        }
+      }
+
+      window.addEventListener('scroll', () => {
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(onScrollFrame);
+        }
+      }, { passive: true });
+      window.addEventListener('resize', () => {
+        resizeGalaxyCanvas();
+        if (reducedMotion) renderGalaxyFrame(performance.now());
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(onScrollFrame);
+        }
+      }, { passive: true });
+      onScrollFrame();
+
+      /* 3. IntersectionObserver Reveal Animations & SpaceBar Fill */
+      const revealEls = Array.from(document.querySelectorAll('.reveal'));
+      if (!reducedMotion && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-revealed');
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -36px 0px' });
+        revealEls.forEach((el) => io.observe(el));
+
+        if (spaceBar) {
+          const barObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                spaceBar.classList.add('is-filled');
+                barObserver.unobserve(entry.target);
+              }
+            });
+          }, { threshold: 0.25 });
+          barObserver.observe(spaceBar);
+        }
+      } else {
+        revealEls.forEach((el) => el.classList.add('is-revealed'));
+        if (spaceBar) spaceBar.classList.add('is-filled');
+      }
+
+      /* 4. Interactive Andromeda macOS Window Controls */
+      const sidebarTabs = Array.from(document.querySelectorAll('.sidebar-btn[role="tab"]'));
+      const appPages = Array.from(document.querySelectorAll('.macos-page'));
+      const toolbarCrumb = document.getElementById('toolbar-crumb');
+
+      function selectAppTab(tab) {
+        if (!tab) return;
+        const targetId = tab.getAttribute('aria-controls');
+        sidebarTabs.forEach((btn) => btn.setAttribute('aria-selected', String(btn === tab)));
+        appPages.forEach((page) => page.classList.toggle('is-active', page.id === targetId));
+        if (toolbarCrumb && tab.dataset.crumb) {
+          toolbarCrumb.textContent = tab.dataset.crumb;
+        }
+      }
+
+      sidebarTabs.forEach((tab) => {
+        tab.addEventListener('click', () => selectAppTab(tab));
+      });
+
+      document.querySelectorAll('[data-jump-tab]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const targetTab = document.getElementById(btn.getAttribute('data-jump-tab'));
+          selectAppTab(targetTab);
+        });
+      });
+
+      document.querySelectorAll('.suggestion-toggle').forEach((toggle) => {
+        toggle.addEventListener('click', () => {
+          const expanded = toggle.getAttribute('aria-expanded') === 'true';
+          const panel = document.getElementById(toggle.getAttribute('aria-controls'));
+          toggle.setAttribute('aria-expanded', String(!expanded));
+          if (panel) panel.hidden = expanded;
+        });
+      });
+
+      const checks = Array.from(document.querySelectorAll('.suggestion-check'));
+      const reviewBtn = document.getElementById('review-count-btn');
+      function updateSuggestionCounts() {
+        const groupCounts = {};
+        checks.forEach((c) => {
+          const g = c.dataset.group;
+          if (!groupCounts[g]) groupCounts[g] = 0;
+          if (c.checked) groupCounts[g] += 1;
+        });
+        Object.keys(groupCounts).forEach((g) => {
+          const el = document.querySelector('[data-group-count="' + g + '"]');
+          if (el) {
+            el.textContent = groupCounts[g] > 0 ? groupCounts[g] + ' selected' : '';
+          }
+        });
+        if (!reviewBtn) return;
+        const count = checks.filter((c) => c.checked).length;
+        reviewBtn.textContent = count === 0 ? 'Review Selected' : count === 1 ? 'Review 1 item' : 'Review ' + count + ' items';
+        reviewBtn.disabled = count === 0;
+      }
+      checks.forEach((c) => c.addEventListener('change', updateSuggestionCounts));
+      if (reviewBtn) {
+        reviewBtn.addEventListener('click', () => {
+          const count = checks.filter((c) => c.checked).length;
+          reviewBtn.textContent = count + ' queued for review ✓';
+          setTimeout(updateSuggestionCounts, 1800);
+        });
+      }
+      updateSuggestionCounts();
+
+      const rescanBtn = document.getElementById('toolbar-rescan');
+      if (rescanBtn) {
+        rescanBtn.addEventListener('click', () => {
+          rescanBtn.textContent = 'Measured ✓';
+          if (spaceBar && !reducedMotion) {
+            spaceBar.classList.remove('is-filled');
+            requestAnimationFrame(() => requestAnimationFrame(() => spaceBar.classList.add('is-filled')));
+          }
+          setTimeout(() => { rescanBtn.textContent = 'Scan again'; }, 1400);
+        });
+      }
+
+      const planToggle = document.getElementById('space-plan-toggle');
+      if (planToggle) {
+        planToggle.addEventListener('click', () => {
+          const added = planToggle.dataset.added === 'true';
+          planToggle.dataset.added = String(!added);
+          planToggle.textContent = added ? 'Add to Space Plan' : 'Saved in Space Plan ✓';
+        });
+      }
+
+      const applyBtn = document.getElementById('apply-preview-btn');
+      if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+          const applied = applyBtn.dataset.applied === 'true';
+          applyBtn.dataset.applied = String(!applied);
+          applyBtn.textContent = applied ? 'Apply plan' : 'Undo this run';
+        });
+      }
+
+      /* 5. FAQ Accordion */
+      document.querySelectorAll('.faq-trigger').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          const expanded = trigger.getAttribute('aria-expanded') === 'true';
+          const panel = document.getElementById(trigger.getAttribute('aria-controls'));
+          trigger.setAttribute('aria-expanded', String(!expanded));
+          if (panel) panel.hidden = expanded;
+        });
+      });
+
+      /* 6. Legal Modal (Privacy Policy & Terms & Conditions) */
+      const legalModal = document.getElementById('legal-modal');
+      const legalTitle = document.getElementById('legal-modal-title');
+      const legalBody = document.getElementById('legal-modal-body');
+      const legalDocs = {
+        privacy: {
+          title: 'Privacy Policy',
+          body: 'Andromeda performs all disk scanning, duplicate matching, OCR content indexing, folder organization, and drive cataloging locally on your Mac. The application contains no usage analytics, telemetry, or crash-reporting trackers, and never uploads filenames or folder structures. Optional donations are processed externally by the donation provider you choose; Andromeda itself collects no personal data.'
+        },
+        terms: {
+          title: 'Terms & Conditions',
+          body: 'Andromeda is free to download and use across your Macs without license keys or subscriptions. Any donation is completely voluntary and does not unlock additional features or create an obligation beyond supporting ongoing development. The software is provided as-is as a signed, notarized macOS application.'
+        }
+      };
+
+      function closeLegal() {
+        if (legalModal) legalModal.hidden = true;
+      }
+
+      document.querySelectorAll('[data-legal-open]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const doc = legalDocs[btn.getAttribute('data-legal-open')];
+          if (!doc || !legalModal) return;
+          legalTitle.textContent = doc.title;
+          legalBody.textContent = doc.body;
+          legalModal.hidden = false;
+        });
+      });
+
+      const legalClose = document.getElementById('legal-modal-close');
+      const legalDone = document.getElementById('legal-modal-done');
+      if (legalClose) legalClose.addEventListener('click', closeLegal);
+      if (legalDone) legalDone.addEventListener('click', closeLegal);
+      if (legalModal) {
+        legalModal.addEventListener('click', (e) => {
+          if (e.target === legalModal) closeLegal();
+        });
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && legalModal && !legalModal.hidden) closeLegal();
+      });
+    })();
+  </script>
 </body>
 </html>
